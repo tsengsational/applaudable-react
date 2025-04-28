@@ -1,58 +1,81 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { firestore, storage } from '../firebase';
-import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { createProgram } from '../services/firestore';
 
 export default function Editor() {
   const { currentUser } = useAuth();
-  const [playbill, setPlaybill] = useState({
+  const navigate = useNavigate();
+  const [program, setProgram] = useState({
     title: '',
     bylines: [''],
     performers: []
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Check if user is authenticated
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login');
+    }
+  }, [currentUser, navigate]);
 
   const handleTitleChange = (e) => {
-    setPlaybill({ ...playbill, title: e.target.value });
+    setProgram({ ...program, title: e.target.value });
   };
 
   const handleBylineChange = (index, value) => {
-    const newBylines = [...playbill.bylines];
+    const newBylines = [...program.bylines];
     newBylines[index] = value;
-    setPlaybill({ ...playbill, bylines: newBylines });
+    setProgram({ ...program, bylines: newBylines });
   };
 
   const addByline = () => {
-    setPlaybill({ ...playbill, bylines: [...playbill.bylines, ''] });
+    setProgram({ ...program, bylines: [...program.bylines, ''] });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
+
+    if (!currentUser) {
+      setError('You must be logged in to create a program');
+      setLoading(false);
+      return;
+    }
 
     try {
-      const playbillData = {
-        ...playbill,
-        userId: currentUser.uid,
-        createdAt: new Date(),
-        subscriptionStatus: 'free' // Default to free tier
+      const programData = {
+        ...program,
+        userId: currentUser.uid
       };
 
-      const docRef = await addDoc(collection(firestore, 'playbills'), playbillData);
-      console.log('Playbill created with ID:', docRef.id);
-      // You might want to redirect to the view page here
+      const programId = await createProgram(programData);
+      navigate(`/view/${programId}`);
     } catch (error) {
-      console.error('Error creating playbill:', error);
+      console.error('Error creating program:', error);
+      setError('Failed to create program. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  if (!currentUser) {
+    return null; // Don't render anything while redirecting
+  }
+
   return (
     <div className="min-h-screen py-12">
       <div className="container">
-        <h1>Create Playbill</h1>
+        <h1>Create Program</h1>
+        
+        {error && (
+          <div className="card mb-4" style={{ backgroundColor: '#fee2e2', color: '#dc2626' }}>
+            {error}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="card">
           <div className="space-y-4">
@@ -64,7 +87,7 @@ export default function Editor() {
               <input
                 type="text"
                 id="title"
-                value={playbill.title}
+                value={program.title}
                 onChange={handleTitleChange}
                 className="form-input"
                 required
@@ -76,7 +99,7 @@ export default function Editor() {
               <label className="form-label">
                 Bylines
               </label>
-              {playbill.bylines.map((byline, index) => (
+              {program.bylines.map((byline, index) => (
                 <div key={index} className="mb-4">
                   <input
                     type="text"
@@ -104,7 +127,7 @@ export default function Editor() {
                 className="btn btn-primary"
                 style={{ width: '100%' }}
               >
-                {loading ? 'Creating...' : 'Create Playbill'}
+                {loading ? 'Creating...' : 'Create Program'}
               </button>
             </div>
           </div>

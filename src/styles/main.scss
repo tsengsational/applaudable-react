@@ -1,0 +1,155 @@
+@import 'variables';
+@import 'mixins';
+
+// Reset and base styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family;
+  line-height: 1.5;
+  background-color: $background-color;
+  color: $text-color;
+}
+
+// Layout
+.container {
+  @include container;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+// Typography
+h1 {
+  font-size: $font-size-4xl;
+  font-weight: bold;
+  margin-bottom: $spacing-4;
+}
+
+h2 {
+  font-size: $font-size-3xl;
+  font-weight: bold;
+  margin-bottom: $spacing-3;
+}
+
+// Buttons
+.btn {
+  @include button-base;
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: $white;
+
+  &:hover {
+    background-color: $primary-hover;
+  }
+}
+
+.btn-secondary {
+  background-color: $white;
+  color: $text-light;
+  border: 1px solid $border-color;
+
+  &:hover {
+    background-color: $background-color;
+  }
+}
+
+// Forms
+.form-group {
+  margin-bottom: $spacing-4;
+}
+
+.form-label {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $text-light;
+  margin-bottom: $spacing-2;
+}
+
+.form-input {
+  width: 100%;
+  padding: $spacing-2;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  background-color: $white;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+}
+
+// Cards
+.card {
+  @include card;
+}
+
+// Utilities
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  @include flex-col;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.space-y-4 > * + * {
+  margin-top: $spacing-4;
+}
+
+.space-x-4 > * + * {
+  margin-left: $spacing-4;
+}
+
+.mt-4 {
+  margin-top: $spacing-4;
+}
+
+.mb-4 {
+  margin-bottom: $spacing-4;
+}
+
+.py-12 {
+  padding-top: $spacing-12;
+  padding-bottom: $spacing-12;
+}
+
+// Responsive utilities
+@include responsive(sm) {
+  .container {
+    padding: 0 $spacing-6;
+  }
+}
+
+@include responsive(md) {
+  .container {
+    padding: 0 $spacing-8;
+  }
+}
+
+@include responsive(lg) {
+  .container {
+    padding: 0 $spacing-12;
+  }
+} 

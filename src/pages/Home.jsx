@@ -10,17 +10,31 @@ export default function Home() {
         <div className="text-center">
           <h1>Welcome to Applaudable</h1>
           <p className="mb-4">
-            Create beautiful digital playbills for your performances
+            Create beautiful digital programs for your performances
           </p>
           
           <div className="space-x-4">
             {currentUser ? (
-              <Link
-                to="/editor"
-                className="btn btn-primary"
-              >
-                Create Playbill
-              </Link>
+              <>
+                <Link
+                  to="/editor"
+                  className="btn btn-primary"
+                >
+                  Create Program
+                </Link>
+                <Link
+                  to="/my-programs"
+                  className="btn btn-secondary"
+                >
+                  My Programs
+                </Link>
+                <Link
+                  to="/collaborators"
+                  className="btn btn-secondary"
+                >
+                  Manage Collaborators
+                </Link>
+              </>
             ) : (
               <Link
                 to="/login"

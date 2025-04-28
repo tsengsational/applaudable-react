@@ -6,7 +6,9 @@ import PrivateRoute from './components/PrivateRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Editor from './pages/Editor';
-import ViewPlaybill from './pages/ViewPlaybill';
+import ViewProgram from './pages/ViewProgram';
+import MyPrograms from './pages/MyPrograms';
+import Collaborators from './pages/Collaborators';
 
 function App() {
   return (
@@ -23,7 +25,23 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path="/view/:id" element={<ViewPlaybill />} />
+          <Route
+            path="/my-programs"
+            element={
+              <PrivateRoute>
+                <MyPrograms />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/collaborators"
+            element={
+              <PrivateRoute>
+                <Collaborators />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/view/:id" element={<ViewProgram />} />
         </Routes>
       </AuthProvider>
     </Router>

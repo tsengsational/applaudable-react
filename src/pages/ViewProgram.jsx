@@ -1,35 +1,32 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { firestore } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { getProgram } from '../services/firestore';
 import QRCode from 'qrcode.react';
 
-export default function ViewPlaybill() {
+export default function ViewProgram() {
   const { id } = useParams();
-  const [playbill, setPlaybill] = useState(null);
+  const [program, setProgram] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchPlaybill = async () => {
+    const fetchProgram = async () => {
       try {
-        const docRef = doc(firestore, 'playbills', id);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          setPlaybill(docSnap.data());
+        const data = await getProgram(id);
+        if (data) {
+          setProgram(data);
         } else {
-          setError('Playbill not found');
+          setError('Program not found');
         }
       } catch (err) {
-        setError('Error loading playbill');
-        console.error('Error fetching playbill:', err);
+        console.error('Error fetching program:', err);
+        setError('Error loading program');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPlaybill();
+    fetchProgram();
   }, [id]);
 
   if (loading) {
@@ -55,16 +52,16 @@ export default function ViewPlaybill() {
           {/* Header */}
           <div className="mb-4">
             <h1 className="text-center">
-              {playbill.title}
+              {program.title}
             </h1>
           </div>
 
           {/* Bylines */}
           <div className="mb-4">
             <div className="space-y-4">
-              {playbill.bylines.map((byline, index) => (
+              {program.bylines.map((byline, index) => (
                 <p key={index} className="text-center">
-                  {byline}
+                  {byline.role}: {byline.collaborator?.creditedName || `${byline.collaborator?.firstName} ${byline.collaborator?.lastName}`}
                 </p>
               ))}
             </div>

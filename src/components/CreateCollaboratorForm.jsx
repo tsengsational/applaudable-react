@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { createCollaborator, generateUniqueId } from '../services/firestore';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function CreateCollaboratorForm({ onSuccess, onCancel }) {
+  const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
     id: generateUniqueId(),
     firstName: '',
@@ -45,8 +47,18 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel }) {
     setLoading(true);
     setError(null);
 
+    if (!currentUser) {
+      setError('You must be logged in to create a collaborator');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const collaborator = await createCollaborator(formData);
+      const collaboratorData = {
+        ...formData,
+        userId: currentUser.uid
+      };
+      const collaborator = await createCollaborator(collaboratorData);
       onSuccess(collaborator);
     } catch (err) {
       console.error('Error creating collaborator:', err);
@@ -128,7 +140,6 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel }) {
             value={formData.email}
             onChange={handleChange}
             className="form-input"
-            required
           />
         </div>
 

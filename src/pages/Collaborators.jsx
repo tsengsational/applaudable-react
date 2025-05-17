@@ -221,7 +221,6 @@ export default function Collaborators() {
                   value={formData.primaryImageUrl}
                   onChange={handleInputChange}
                   className="form-input"
-                  required
                 />
               </div>
 

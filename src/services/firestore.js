@@ -53,15 +53,23 @@ export const getUserCollaborators = async (userId) => {
   try {
     const q = query(
       collaboratorsCollection,
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      where('userId', '==', userId)
     );
     
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
+    const collaborators = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
+
+    // Sort in memory by createdAt
+    collaborators.sort((a, b) => {
+      const dateA = a.createdAt?.toDate() || new Date(0);
+      const dateB = b.createdAt?.toDate() || new Date(0);
+      return dateB - dateA; // Descending order
+    });
+
+    return collaborators;
   } catch (error) {
     console.error('Error getting user collaborators:', error);
     throw error;
@@ -114,23 +122,41 @@ export const getProgram = async (id) => {
         ...docSnap.data()
       };
 
+      // Ensure sections and bylines exist
+      if (!program.sections) {
+        program.sections = [];
+      }
+
       // Fetch collaborator details for each byline
       const bylinesWithCollaborators = await Promise.all(
-        program.bylines.map(async (byline) => {
-          if (byline.collaboratorId) {
-            const collaborator = await getCollaborator(byline.collaboratorId);
-            return {
-              ...byline,
-              collaborator
-            };
+        (program.sections || []).map(async (section) => {
+          if (!section.bylines) {
+            section.bylines = [];
           }
-          return byline;
+          
+          const bylinesWithCollaborators = await Promise.all(
+            section.bylines.map(async (byline) => {
+              if (byline.collaboratorId) {
+                const collaborator = await getCollaborator(byline.collaboratorId);
+                return {
+                  ...byline,
+                  collaborator
+                };
+              }
+              return byline;
+            })
+          );
+
+          return {
+            ...section,
+            bylines: bylinesWithCollaborators
+          };
         })
       );
 
       return {
         ...program,
-        bylines: bylinesWithCollaborators
+        sections: bylinesWithCollaborators
       };
     }
     return null;
@@ -164,22 +190,41 @@ export const getUserPrograms = async (userId) => {
     // Fetch collaborator details for each program's bylines
     const programsWithCollaborators = await Promise.all(
       programs.map(async (program) => {
-        const bylinesWithCollaborators = await Promise.all(
-          program.bylines.map(async (byline) => {
-            if (byline.collaboratorId) {
-              const collaborator = await getCollaborator(byline.collaboratorId);
-              return {
-                ...byline,
-                collaborator
-              };
+        // Ensure sections exist
+        if (!program.sections) {
+          program.sections = [];
+        }
+
+        const sectionsWithCollaborators = await Promise.all(
+          program.sections.map(async (section) => {
+            // Ensure bylines exist
+            if (!section.bylines) {
+              section.bylines = [];
             }
-            return byline;
+
+            const bylinesWithCollaborators = await Promise.all(
+              section.bylines.map(async (byline) => {
+                if (byline.collaboratorId) {
+                  const collaborator = await getCollaborator(byline.collaboratorId);
+                  return {
+                    ...byline,
+                    collaborator
+                  };
+                }
+                return byline;
+              })
+            );
+
+            return {
+              ...section,
+              bylines: bylinesWithCollaborators
+            };
           })
         );
 
         return {
           ...program,
-          bylines: bylinesWithCollaborators
+          sections: sectionsWithCollaborators
         };
       })
     );

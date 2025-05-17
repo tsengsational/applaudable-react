@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getUserPrograms } from '../services/firestore';
+import { getUserPrograms, deleteProgram } from '../services/firestore';
+import QRCode from 'qrcode.react';
 
 export default function MyPrograms() {
   const { currentUser } = useAuth();
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deletingProgramId, setDeletingProgramId] = useState(null);
 
   useEffect(() => {
     const fetchPrograms = async () => {
@@ -26,6 +28,23 @@ export default function MyPrograms() {
 
     fetchPrograms();
   }, [currentUser]);
+
+  const handleDeleteProgram = async (programId) => {
+    if (!window.confirm('Are you sure you want to delete this program? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeletingProgramId(programId);
+    try {
+      await deleteProgram(programId);
+      setPrograms(programs.filter(p => p.id !== programId));
+    } catch (err) {
+      console.error('Error deleting program:', err);
+      setError('Failed to delete program');
+    } finally {
+      setDeletingProgramId(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -64,23 +83,51 @@ export default function MyPrograms() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((program) => (
               <div key={program.id} className="card">
-                <h2 className="text-xl font-bold mb-2">{program.title}</h2>
+                <div className="flex flex-col items-center mb-4">
+                  <div className="w-full text-center mb-4">
+                    <h2 className="text-xl font-bold mb-2">{program.title}</h2>
+                    {program.subtitle && (
+                      <p className="text-gray-600">{program.subtitle}</p>
+                    )}
+                  </div>
+                  <div className="bg-white p-2 rounded-lg">
+                    <QRCode 
+                      value={`${window.location.origin}/view/${program.id}`}
+                      size={200}
+                      level="H"
+                      includeMargin={true}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2 mb-4">
-                  {program.bylines.map((byline, index) => (
-                    <p key={index} className="text-sm text-gray-600">
-                      {byline.role}: {byline.collaborator?.creditedName || `${byline.collaborator?.firstName} ${byline.collaborator?.lastName}`}
-                    </p>
+                  {program.sections?.map((section) => (
+                    section.type === 'credits' && section.bylines?.map((byline, index) => (
+                      <p key={index} className="text-sm text-gray-600">
+                        {byline.role}: {byline.collaborator?.creditedName || 
+                          `${byline.collaborator?.firstName || ''} ${byline.collaborator?.lastName || ''}`}
+                      </p>
+                    ))
                   ))}
                 </div>
                 <div className="flex justify-between items-center">
-                  <Link
-                    to={`/view/${program.id}`}
-                    className="btn btn-secondary"
-                  >
-                    View
-                  </Link>
+                  <div className="space-x-2">
+                    <Link
+                      to={`/view/${program.id}`}
+                      className="btn btn-secondary"
+                    >
+                      View
+                    </Link>
+                    <button
+                      onClick={() => handleDeleteProgram(program.id)}
+                      disabled={deletingProgramId === program.id}
+                      className="btn btn-secondary"
+                      style={{ backgroundColor: '#fee2e2', color: '#dc2626' }}
+                    >
+                      {deletingProgramId === program.id ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </div>
                   <span className="text-sm text-gray-500">
-                    {new Date(program.createdAt?.toDate()).toLocaleDateString()}
+                    {program.createdAt?.toDate().toLocaleDateString() || 'No date'}
                   </span>
                 </div>
               </div>

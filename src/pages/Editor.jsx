@@ -82,9 +82,9 @@ export default function Editor() {
       subtitle: '',
       content: '',
       order: program.sections.length,
-      bylines: type === SECTION_TYPES.CREDITS ? [] : undefined,
-      mediaType: type === SECTION_TYPES.MEDIA ? MEDIA_TYPES.IMAGE : undefined,
-      mediaSource: type === SECTION_TYPES.MEDIA ? '' : undefined
+      bylines: type === SECTION_TYPES.CREDITS ? [] : [],
+      mediaType: type === SECTION_TYPES.MEDIA ? MEDIA_TYPES.IMAGE : '',
+      mediaSource: type === SECTION_TYPES.MEDIA ? '' : ''
     };
 
     setProgram({
@@ -232,7 +232,6 @@ export default function Editor() {
                   value={program.primaryImageUrl}
                   onChange={handlePrimaryImageChange}
                   className="form-input"
-                  required
                 />
               </div>
             </div>

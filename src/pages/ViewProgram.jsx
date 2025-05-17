@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProgram } from '../services/firestore';
-import QRCode from 'qrcode.react';
 
 export default function ViewProgram() {
   const { id } = useParams();
@@ -54,27 +53,88 @@ export default function ViewProgram() {
             <h1 className="text-center">
               {program.title}
             </h1>
+            {program.subtitle && (
+              <h2 className="text-center text-gray-600">
+                {program.subtitle}
+              </h2>
+            )}
           </div>
 
-          {/* Bylines */}
-          <div className="mb-4">
-            <div className="space-y-4">
-              {program.bylines.map((byline, index) => (
-                <p key={index} className="text-center">
-                  {byline.role}: {byline.collaborator?.creditedName || `${byline.collaborator?.firstName} ${byline.collaborator?.lastName}`}
-                </p>
-              ))}
+          {/* Primary Image */}
+          {program.primaryImageUrl && (
+            <div className="mb-8">
+              <img 
+                src={program.primaryImageUrl} 
+                alt={program.title}
+                className="w-full h-auto rounded-lg"
+              />
             </div>
-          </div>
+          )}
 
-          {/* QR Code */}
-          <div className="flex justify-center">
-            <QRCode
-              value={window.location.href}
-              size={128}
-              level="H"
-              includeMargin={true}
-            />
+          {/* Sections */}
+          <div className="space-y-8">
+            {program.sections?.map((section, index) => (
+              <div key={section.id || index} className="border-t pt-4">
+                <h3 className="text-xl font-bold mb-2">{section.title}</h3>
+                {section.subtitle && (
+                  <h4 className="text-lg text-gray-600 mb-4">{section.subtitle}</h4>
+                )}
+
+                {/* Section Content */}
+                {section.type === 'text' && section.content && (
+                  <div className="prose max-w-none">
+                    {section.content}
+                  </div>
+                )}
+
+                {/* Media Section */}
+                {section.type === 'media' && section.mediaSource && (
+                  <div className="mt-4">
+                    {section.mediaType === 'image' && (
+                      <img 
+                        src={section.mediaSource} 
+                        alt={section.title}
+                        className="w-full h-auto rounded-lg"
+                      />
+                    )}
+                    {section.mediaType === 'video' && (
+                      <video 
+                        src={section.mediaSource} 
+                        controls
+                        className="w-full rounded-lg"
+                      />
+                    )}
+                    {section.mediaType === 'gallery' && (
+                      <div className="grid grid-cols-2 gap-4">
+                        {section.mediaSource.split(',').map((url, i) => (
+                          <img 
+                            key={i}
+                            src={url.trim()} 
+                            alt={`${section.title} - Image ${i + 1}`}
+                            className="w-full h-auto rounded-lg"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Credits Section */}
+                {section.type === 'credits' && section.bylines?.length > 0 && (
+                  <div className="space-y-4">
+                    {section.bylines.map((byline, bylineIndex) => (
+                      <div key={bylineIndex} className="flex justify-between items-center">
+                        <span className="font-medium">{byline.role}: </span>
+                        <span>
+                          {byline.collaborator?.creditedName || 
+                            `${byline.collaborator?.firstName || ''} ${byline.collaborator?.lastName || ''}`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>

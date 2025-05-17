@@ -8,8 +8,8 @@ export default function Home() {
     <div className="min-h-screen">
       <div className="container py-12">
         <div className="text-center">
-          <h1>Welcome to Applaudable</h1>
-          <p className="mb-4">
+          <h1 className="text-4xl font-bold mb-4">Welcome to Applaudable</h1>
+          <p className="text-xl text-gray-600 mb-8">
             Create beautiful digital programs for your performances
           </p>
           

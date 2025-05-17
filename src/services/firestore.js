@@ -209,4 +209,10 @@ export const deleteProgram = async (id) => {
     console.error('Error deleting program:', error);
     throw error;
   }
+};
+
+export const generateUniqueId = () => {
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substring(2, 8);
+  return `${timestamp}-${randomStr}`;
 }; 

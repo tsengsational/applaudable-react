@@ -117,6 +117,12 @@ export default function MyPrograms() {
                     >
                       View
                     </Link>
+                    <Link
+                      to={`/editor/${program.id}`}
+                      className="btn btn-secondary"
+                    >
+                      Edit
+                    </Link>
                     <button
                       onClick={() => handleDeleteProgram(program.id)}
                       disabled={deletingProgramId === program.id}

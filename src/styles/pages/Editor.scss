@@ -1,0 +1,114 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.page {
+  padding: v.$spacing-8;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: v.$font-size-3xl;
+  margin-bottom: v.$spacing-8;
+}
+
+.error {
+  color: v.$error;
+  margin-bottom: v.$spacing-4;
+}
+
+.form {
+  @include m.flex(column, flex-start, stretch, v.$spacing-8);
+}
+
+.section {
+  @include m.card;
+}
+
+.section-header {
+  @include m.flex(row, space-between, center);
+  margin-bottom: v.$spacing-6;
+}
+
+.section-title {
+  font-size: v.$font-size-2xl;
+  margin: 0;
+}
+
+.button-group {
+  @include m.flex(row, flex-start, center, v.$spacing-2);
+}
+
+.form-group {
+  margin-bottom: v.$spacing-4;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: v.$spacing-2;
+  font-weight: 500;
+}
+
+.form-input {
+  @include m.input;
+}
+
+.button {
+  @include m.button;
+  
+  &.danger-button {
+    @include m.button(v.$error, white, darken(v.$error, 10%));
+  }
+}
+
+.flex-group {
+  @include m.flex(row, space-between, center);
+  margin-bottom: v.$spacing-2;
+}
+
+.sub-title {
+  font-size: v.$font-size-lg;
+  margin: 0;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.text-button {
+  background: none;
+  border: none;
+  color: v.$primary;
+  cursor: pointer;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.submit-button {
+  @extend .button;
+  align-self: flex-start;
+  padding: v.$spacing-3 v.$spacing-6;
+  font-size: v.$font-size-lg;
+}
+
+.space-group {
+  @include m.flex(column, flex-start, stretch, v.$spacing-4);
+  margin: v.$spacing-4 0;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-gray {
+  color: v.$text-secondary;
+}
+
+.mt-group {
+  margin-top: v.$spacing-4;
+} 

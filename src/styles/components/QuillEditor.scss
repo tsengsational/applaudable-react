@@ -1,0 +1,32 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.editor {
+  margin-top: v.$spacing-4;
+  
+  .quill-container {
+    height: 300px;
+    margin-bottom: 50px;
+  }
+  
+  .ql-toolbar {
+    border-top-left-radius: v.$border-radius-sm;
+    border-top-right-radius: v.$border-radius-sm;
+    border-color: v.$border;
+  }
+  
+  .ql-container {
+    border-bottom-left-radius: v.$border-radius-sm;
+    border-bottom-right-radius: v.$border-radius-sm;
+    border-color: v.$border;
+    font-size: v.$font-size-base;
+  }
+  
+  .ql-editor {
+    min-height: 200px;
+    
+    p {
+      margin-bottom: v.$spacing-4;
+    }
+  }
+} 

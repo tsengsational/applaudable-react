@@ -1,0 +1,75 @@
+@use 'variables' as v;
+
+// Flexbox
+@mixin flex($direction: row, $justify: flex-start, $align: stretch, $gap: 0) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+  gap: $gap;
+}
+
+// Typography
+@mixin text($size: v.$font-size-base, $weight: normal, $color: v.$text-primary) {
+  font-size: $size;
+  font-weight: $weight;
+  color: $color;
+}
+
+// Buttons
+@mixin button($bg-color: v.$primary, $text-color: white, $hover-color: v.$primary-dark) {
+  padding: v.$spacing-2 v.$spacing-4;
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: v.$border-radius;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $hover-color;
+  }
+
+  &:disabled {
+    background-color: v.$primary-light;
+    cursor: not-allowed;
+  }
+}
+
+// Form inputs
+@mixin input {
+  width: 100%;
+  padding: v.$spacing-2;
+  border: 1px solid v.$border;
+  border-radius: v.$border-radius-sm;
+  font-size: v.$font-size-base;
+
+  &:focus {
+    outline: none;
+    border-color: v.$primary;
+    box-shadow: 0 0 0 3px rgba(v.$primary, 0.1);
+  }
+}
+
+// Cards
+@mixin card {
+  background: white;
+  border-radius: v.$border-radius;
+  padding: v.$spacing-6;
+  margin-bottom: v.$spacing-8;
+  box-shadow: v.$shadow;
+}
+
+// Media queries
+@mixin media-up($breakpoint) {
+  @if $breakpoint == sm {
+    @media (min-width: v.$breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: v.$breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: v.$breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: v.$breakpoint-xl) { @content; }
+  }
+} 

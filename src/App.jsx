@@ -31,6 +31,14 @@ function App() {
                 }
               />
               <Route
+                path="/editor/:id"
+                element={
+                  <PrivateRoute>
+                    <Editor />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/my-programs"
                 element={
                   <PrivateRoute>

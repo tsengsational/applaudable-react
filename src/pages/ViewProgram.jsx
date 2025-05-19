@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProgram } from '../services/firestore';
 import DOMPurify from 'dompurify';
+import { ImageUploader } from '../components/ImageUploader';
 
 export default function ViewProgram() {
   const { id } = useParams();
   const [program, setProgram] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [uploadedImages, setUploadedImages] = useState({});
 
   // Configure DOMPurify to allow specific HTML elements and attributes
   const sanitizeConfig = {
@@ -38,6 +40,11 @@ export default function ViewProgram() {
     fetchProgram();
   }, [id]);
 
+  const handleImageUpload = (urlsByWidth) => {
+    console.log('Uploaded images:', urlsByWidth);
+    setUploadedImages(urlsByWidth);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -58,6 +65,35 @@ export default function ViewProgram() {
     <div className="min-h-screen py-12">
       <div className="container">
         <div className="card">
+          {/* Test Upload Section */}
+          <div className="mb-8 p-4 border rounded-lg">
+            <h2 className="text-xl font-bold mb-4">Test Image Upload</h2>
+            <ImageUploader 
+              userId="test-user" 
+              onUpload={handleImageUpload}
+              className="mb-4"
+            />
+            
+            {/* Display uploaded images */}
+            {Object.entries(uploadedImages).length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold mb-2">Uploaded Images:</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {Object.entries(uploadedImages).map(([width, url]) => (
+                    <div key={width} className="border rounded p-2">
+                      <p className="text-sm text-gray-600 mb-2">{width}px width</p>
+                      <img 
+                        src={url} 
+                        alt={`${width}px width`}
+                        className="w-full h-auto rounded"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Header */}
           <div className="mb-4">
             <h1 className="text-center">

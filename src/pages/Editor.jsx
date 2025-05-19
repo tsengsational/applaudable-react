@@ -4,10 +4,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { createProgram, getUserCollaborators, generateUniqueId, getProgram, updateProgram } from '../services/firestore';
 import Modal from '../components/Modal';
 import CreateCollaboratorForm from '../components/CreateCollaboratorForm';
+import { ImageUploader } from '../components/ImageUploader';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import '../styles/pages/Editor.scss';
 import '../styles/components/QuillEditor.scss';
+import { deleteImage } from '../services/imageService';
 
 const SECTION_TYPES = {
   TEXT: 'text',
@@ -83,8 +85,59 @@ export default function Editor() {
     setProgram({ ...program, subtitle: e.target.value });
   };
 
-  const handlePrimaryImageChange = (e) => {
-    setProgram({ ...program, primaryImageUrl: e.target.value });
+  const handlePrimaryImageUpload = async (urlsByWidth) => {
+    try {
+      // If there's an existing image, delete it first
+      if (program.primaryImageUrl) {
+        await handlePrimaryImageDelete();
+      }
+
+      // Use the largest width (1280px) as the primary image
+      const primaryImageUrl = urlsByWidth['1280'];
+      if (!primaryImageUrl) {
+        throw new Error('Failed to get primary image URL');
+      }
+
+      // Update program state with new image URL
+      const updatedProgram = { ...program, primaryImageUrl };
+      setProgram(updatedProgram);
+
+      // If we have a program ID, update it in Firestore
+      if (id) {
+        setLoading(true);
+        try {
+          await updateProgram(id, updatedProgram);
+          console.log('Program updated with new primary image');
+        } catch (err) {
+          console.error('Error updating program:', err);
+          setError('Failed to save program with new image');
+        } finally {
+          setLoading(false);
+        }
+      }
+    } catch (err) {
+      console.error('Error updating primary image:', err);
+      setError('Failed to update primary image. Please try again.');
+    }
+  };
+
+  const handlePrimaryImageDelete = async () => {
+    if (!program.primaryImageUrl) return;
+
+    try {
+      // Extract image ID from URL
+      const urlParts = program.primaryImageUrl.split('/');
+      const imageId = urlParts[urlParts.length - 1].split('_')[0];
+      
+      // Delete image from Storage and Firestore
+      await deleteImage(currentUser.uid, imageId);
+      
+      // Update program state
+      setProgram({ ...program, primaryImageUrl: '' });
+    } catch (err) {
+      console.error('Error deleting image:', err);
+      setError('Failed to delete image');
+    }
   };
 
   const addSection = (type) => {
@@ -247,13 +300,13 @@ export default function Editor() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="primaryImage" className="form-label">Primary Image URL</label>
-              <input
-                type="url"
-                id="primaryImage"
-                value={program.primaryImageUrl}
-                onChange={handlePrimaryImageChange}
-                className="form-input"
+              <label className="form-label">Primary Image</label>
+              <ImageUploader 
+                userId={currentUser.uid}
+                onUpload={handlePrimaryImageUpload}
+                onDelete={handlePrimaryImageDelete}
+                existingImageUrl={program.primaryImageUrl}
+                className="mb-4"
               />
             </div>
           </div>

@@ -1,12 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProgram } from '../services/firestore';
+import DOMPurify from 'dompurify';
 
 export default function ViewProgram() {
   const { id } = useParams();
   const [program, setProgram] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Configure DOMPurify to allow specific HTML elements and attributes
+  const sanitizeConfig = {
+    ALLOWED_TAGS: [
+      'p', 'br', 'b', 'i', 'em', 'strong', 'a', 'ul', 'ol', 'li',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'code'
+    ],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
+  };
 
   useEffect(() => {
     const fetchProgram = async () => {
@@ -82,9 +92,18 @@ export default function ViewProgram() {
 
                 {/* Section Content */}
                 {section.type === 'text' && section.content && (
-                  <div className="prose max-w-none">
-                    {section.content}
-                  </div>
+                  <div 
+                    className="prose max-w-none"
+                    dangerouslySetInnerHTML={{ 
+                      __html: DOMPurify.sanitize(section.content, {
+                        ALLOWED_TAGS: [
+                          'p', 'br', 'b', 'i', 'em', 'strong', 'a', 'ul', 'ol', 'li',
+                          'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'code'
+                        ],
+                        ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
+                      })
+                    }}
+                  />
                 )}
 
                 {/* Media Section */}

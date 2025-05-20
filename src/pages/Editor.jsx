@@ -58,15 +58,28 @@ export default function Editor() {
       if (!currentUser) return;
 
       try {
+        console.log('Fetching data for user:', currentUser.uid);
         const [userCollaborators, existingProgram] = await Promise.all([
           getUserCollaborators(currentUser.uid),
           id ? getProgram(id) : null
         ]);
         
-        setCollaborators(userCollaborators);
+        console.log('Fetched collaborators:', userCollaborators);
+        console.log('Fetched program:', existingProgram);
+        
+        if (userCollaborators) {
+          setCollaborators(userCollaborators);
+        } else {
+          console.warn('No collaborators found for user');
+          setCollaborators([]);
+        }
         
         if (existingProgram) {
+          console.log('Setting program data:', existingProgram);
           setProgram(existingProgram);
+        } else if (id) {
+          console.warn('No program found with ID:', id);
+          setError('Program not found');
         }
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -190,7 +203,7 @@ export default function Editor() {
 
   const addByline = (sectionId, collaboratorId, role) => {
     updateSection(sectionId, {
-      bylines: [...program.sections.find(s => s.id === sectionId).bylines, { role, collaboratorId }]
+      bylines: [...program.sections.find(s => s.id === sectionId).bylines, { id: collaboratorId, role }]
     });
   };
 
@@ -250,13 +263,62 @@ export default function Editor() {
     }
   };
 
-  const handleCreateCollaboratorSuccess = (newCollaborator) => {
-    setCollaborators(prev => [...prev, newCollaborator]);
-    setShowCreateCollaboratorModal(false);
+  const handleCreateCollaboratorSuccess = async (newCollaborator) => {
+    try {
+      if (!newCollaborator || !newCollaborator.id) {
+        throw new Error('Invalid collaborator data');
+      }
+      
+      // Fetch the complete updated list of collaborators
+      const updatedCollaborators = await getUserCollaborators(currentUser.uid);
+      setCollaborators(updatedCollaborators);
+      
+      // If we have a selected section, automatically add the new collaborator
+      if (selectedSection) {
+        const role = prompt('Enter role for this collaborator:');
+        if (role) {
+          addByline(selectedSection, newCollaborator.id, role);
+        }
+      }
+      
+      setShowCreateCollaboratorModal(false);
+      setShowCollaboratorMenu(true); // Reopen the collaborator selection menu
+    } catch (err) {
+      console.error('Error handling new collaborator:', err);
+      setError('Failed to add new collaborator. Please try again.');
+    }
   };
 
+  if (error) {
+    return (
+      <div className="page">
+        <div className="container">
+          <div className="error-message">
+            <h2>Error</h2>
+            <p>{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="button"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!currentUser) {
-    return null;
+    return (
+      <div className="page">
+        <div className="container">
+          <div className="error-message">
+            <h2>Authentication Required</h2>
+            <p>Please log in to access this page.</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -481,7 +543,7 @@ export default function Editor() {
                       </div>
 
                       {section.bylines.map((byline, bylineIndex) => {
-                        const collaborator = collaborators.find(c => c.id === byline.collaboratorId);
+                        const collaborator = collaborators.find(c => c.id === byline.id);
                         return (
                           <div key={bylineIndex} className="flex-group">
                             <div>

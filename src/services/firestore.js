@@ -24,7 +24,13 @@ export const createCollaborator = async (collaboratorData) => {
       ...collaboratorData,
       createdAt: serverTimestamp()
     });
-    return docRef.id;
+    
+    // Get the newly created collaborator
+    const docSnap = await getDoc(docRef);
+    return {
+      id: docSnap.id,
+      ...docSnap.data()
+    };
   } catch (error) {
     console.error('Error creating collaborator:', error);
     throw error;
@@ -33,15 +39,19 @@ export const createCollaborator = async (collaboratorData) => {
 
 export const getCollaborator = async (id) => {
   try {
+    console.log('Fetching collaborator with ID:', id);
     const docRef = doc(firestore, 'collaborators', id);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      return {
+      const collaborator = {
         id: docSnap.id,
         ...docSnap.data()
       };
+      console.log('Found collaborator:', collaborator);
+      return collaborator;
     }
+    console.log('No collaborator found with ID:', id);
     return null;
   } catch (error) {
     console.error('Error getting collaborator:', error);
@@ -51,16 +61,28 @@ export const getCollaborator = async (id) => {
 
 export const getUserCollaborators = async (userId) => {
   try {
+    console.log('Fetching collaborators for user:', userId);
     const q = query(
       collaboratorsCollection,
       where('userId', '==', userId)
     );
     
     const querySnapshot = await getDocs(q);
-    const collaborators = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    console.log('Query snapshot:', querySnapshot);
+    
+    if (querySnapshot.empty) {
+      console.log('No collaborators found for user:', userId);
+      return [];
+    }
+
+    const collaborators = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      console.log('Collaborator data:', { id: doc.id, ...data });
+      return {
+        id: doc.id,
+        ...data
+      };
+    });
 
     // Sort in memory by createdAt
     collaborators.sort((a, b) => {
@@ -69,6 +91,7 @@ export const getUserCollaborators = async (userId) => {
       return dateB - dateA; // Descending order
     });
 
+    console.log('Sorted collaborators:', collaborators);
     return collaborators;
   } catch (error) {
     console.error('Error getting user collaborators:', error);
@@ -136,8 +159,8 @@ export const getProgram = async (id) => {
           
           const bylinesWithCollaborators = await Promise.all(
             section.bylines.map(async (byline) => {
-              if (byline.collaboratorId) {
-                const collaborator = await getCollaborator(byline.collaboratorId);
+              if (byline.id) {
+                const collaborator = await getCollaborator(byline.id);
                 return {
                   ...byline,
                   collaborator

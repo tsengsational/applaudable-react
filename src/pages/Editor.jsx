@@ -10,6 +10,8 @@ import 'react-quill/dist/quill.snow.css';
 import '../styles/pages/Editor.scss';
 import '../styles/components/QuillEditor.scss';
 import { deleteImage } from '../services/imageService';
+import { TextSection } from '../components/sections/TextSection';
+import { MediaSection } from '../components/sections/MediaSection';
 
 const SECTION_TYPES = {
   TEXT: 'text',
@@ -163,7 +165,8 @@ export default function Editor() {
       order: program.sections.length,
       bylines: type === SECTION_TYPES.CREDITS ? [] : [],
       mediaType: type === SECTION_TYPES.MEDIA ? MEDIA_TYPES.IMAGE : '',
-      mediaSource: type === SECTION_TYPES.MEDIA ? '' : ''
+      mediaSource: type === SECTION_TYPES.MEDIA ? '' : '',
+      galleryImages: type === SECTION_TYPES.MEDIA ? [] : []
     };
 
     setProgram({
@@ -289,6 +292,30 @@ export default function Editor() {
     } catch (err) {
       console.error('Error handling new collaborator:', err);
       setError('Failed to add new collaborator. Please try again.');
+    }
+  };
+
+  const renderSection = (section) => {
+    switch (section.type) {
+      case 'text':
+        return (
+          <TextSection
+            key={section.id}
+            section={section}
+            onUpdate={updateSection}
+          />
+        );
+      case 'media':
+        return (
+          <MediaSection
+            key={section.id}
+            section={section}
+            onUpdate={updateSection}
+            userId={currentUser.uid}
+          />
+        );
+      default:
+        return null;
     }
   };
 
@@ -462,72 +489,7 @@ export default function Editor() {
                     />
                   </div>
 
-                  {section.type === SECTION_TYPES.TEXT && (
-                    <div className="form-group">
-                      <label className="form-label">Content</label>
-                      <div className="editor">
-                        <ReactQuill
-                          value={section.content}
-                          onChange={(content) => updateSection(section.id, { content })}
-                          modules={{
-                            toolbar: [
-                              [{ 'header': [1, 2, 3, false] }],
-                              ['bold', 'italic', 'underline', 'strike'],
-                              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                              [{ 'align': [] }],
-                              ['link'],
-                              ['clean']
-                            ]
-                          }}
-                          theme="snow"
-                          className="quill-container"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {section.type === SECTION_TYPES.MEDIA && (
-                    <div className="form-group">
-                      <label className="form-label">Media Type</label>
-                      <select
-                        value={section.mediaType}
-                        onChange={(e) => updateSection(section.id, { mediaType: e.target.value })}
-                        className="form-input"
-                        required
-                      >
-                        {Object.values(MEDIA_TYPES).map(type => (
-                          <option key={type} value={type}>
-                            {type.charAt(0).toUpperCase() + type.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {section.type === SECTION_TYPES.MEDIA && section.mediaType === MEDIA_TYPES.IMAGE && (
-                    <div className="form-group">
-                      <label className="form-label">Image</label>
-                      <ImageUploader
-                        userId={currentUser.uid}
-                        onUpload={(urlsByWidth) => updateSection(section.id, { mediaSource: urlsByWidth['1280'] })}
-                        onDelete={() => updateSection(section.id, { mediaSource: '' })}
-                        existingImageUrl={section.mediaSource}
-                      />
-                    </div>
-                  )}
-
-                  {section.type === SECTION_TYPES.MEDIA && (
-                    <div className="form-group">
-                      <label className="form-label">Media Source URL</label>
-                      <input
-                        type="url"
-                        value={section.mediaSource}
-                        onChange={(e) => updateSection(section.id, { mediaSource: e.target.value })}
-                        className="form-input"
-                        required
-                      />
-                    </div>
-                  )}
+                  {renderSection(section)}
 
                   {section.type === SECTION_TYPES.CREDITS && (
                     <div className="form-group">

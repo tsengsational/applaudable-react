@@ -88,6 +88,10 @@ export const uploadToStorage = async (blob, path) => {
  * @returns {string} Storage path
  */
 export const generateStoragePath = (userId, filename, width) => {
+  if (!userId) {
+    throw new Error('User ID is required for generating storage path');
+  }
+
   // Remove file extension
   const baseName = filename.replace(/\.[^/.]+$/, '');
   // Replace spaces and special characters with underscores

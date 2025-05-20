@@ -99,16 +99,6 @@ export default function MyPrograms() {
                     />
                   </div>
                 </div>
-                <div className="space-y-2 mb-4">
-                  {program.sections?.map((section) => (
-                    section.type === 'credits' && section.bylines?.map((byline, index) => (
-                      <p key={index} className="text-sm text-gray-600">
-                        {byline.role}: {byline.collaborator?.creditedName || 
-                          `${byline.collaborator?.firstName || ''} ${byline.collaborator?.lastName || ''}`}
-                      </p>
-                    ))
-                  ))}
-                </div>
                 <div className="flex justify-between items-center">
                   <div className="space-x-2">
                     <Link

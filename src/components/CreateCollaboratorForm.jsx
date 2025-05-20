@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { createCollaborator, updateCollaborator } from '../services/firestore';
 import { serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
+import { ImageUploader } from './ImageUploader';
+import { deleteImage } from '../services/imageService';
 
 export default function CreateCollaboratorForm({ onSuccess, onCancel, initialData }) {
   const { currentUser } = useAuth();
@@ -18,7 +20,8 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel, initialDat
       twitter: '',
       linkedin: '',
       facebook: ''
-    }
+    },
+    primaryImageUrl: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -38,10 +41,61 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel, initialDat
           twitter: '',
           linkedin: '',
           facebook: ''
-        }
+        },
+        primaryImageUrl: initialData.primaryImageUrl || ''
       });
     }
   }, [initialData]);
+
+  if (!currentUser) {
+    return (
+      <div className="error-message">
+        You must be logged in to create a collaborator
+      </div>
+    );
+  }
+
+  const handleImageUpload = async (urlsByWidth) => {
+    try {
+      // If there's an existing image, delete it first
+      if (formData.primaryImageUrl) {
+        await handleImageDelete();
+      }
+
+      // Use the largest width (1280px) as the primary image
+      const primaryImageUrl = urlsByWidth['1280'];
+      if (!primaryImageUrl) {
+        throw new Error('Failed to get primary image URL');
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        primaryImageUrl
+      }));
+    } catch (err) {
+      console.error('Error updating primary image:', err);
+      setError('Failed to update primary image. Please try again.');
+    }
+  };
+
+  const handleImageDelete = async () => {
+    if (!formData.primaryImageUrl) return;
+
+    try {
+      // Extract image ID from URL
+      const urlParts = formData.primaryImageUrl.split('/');
+      const imageId = urlParts[urlParts.length - 1].split('_')[0];
+      
+      // Delete image from Storage and Firestore
+      await deleteImage(currentUser.uid, imageId);
+      
+      // Update form data
+      setFormData(prev => ({ ...prev, primaryImageUrl: '' }));
+    } catch (err) {
+      console.error('Error deleting image:', err);
+      setError('Failed to delete image');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -83,6 +137,7 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel, initialDat
         phone: formData.phone,
         website: formData.website,
         socialLinks: formData.socialLinks,
+        primaryImageUrl: formData.primaryImageUrl,
         userId: currentUser.uid,
         createdAt: serverTimestamp()
       };
@@ -109,6 +164,17 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel, initialDat
           {error}
         </div>
       )}
+
+      <div className="form-group">
+        <label className="form-label">Profile Image</label>
+        <ImageUploader 
+          userId={currentUser?.uid}
+          onUpload={handleImageUpload}
+          onDelete={handleImageDelete}
+          existingImageUrl={formData.primaryImageUrl}
+          className="mb-4"
+        />
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="form-group">

@@ -1,73 +1,64 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getProgram, getCollaborator } from '../services/firestore';
-import DOMPurify from 'dompurify';
-import { ImageUploader } from '../components/ImageUploader';
+import { TextSection } from '../components/sections/view/TextSection';
+import { ImageMedia } from '../components/sections/view/ImageMedia';
+import { GalleryMedia } from '../components/sections/view/GalleryMedia';
+import { VideoMedia } from '../components/sections/view/VideoMedia';
+import { CreditsSection } from '../components/sections/view/CreditsSection';
+import '../styles/pages/ViewProgram.scss';
 
-export default function ViewProgram() {
+export const ViewProgram = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [program, setProgram] = useState(null);
+  const [collaborators, setCollaborators] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [uploadedImages, setUploadedImages] = useState({});
-  const [collaborators, setCollaborators] = useState({});
-
-  // Configure DOMPurify to allow specific HTML elements and attributes
-  const sanitizeConfig = {
-    ALLOWED_TAGS: [
-      'p', 'br', 'b', 'i', 'em', 'strong', 'a', 'ul', 'ol', 'li',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'code'
-    ],
-    ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
-  };
 
   useEffect(() => {
     const fetchProgram = async () => {
       try {
-        const data = await getProgram(id);
-        if (data) {
-          console.log('Loading program data...');
-          setProgram(data);
-          
-          // Fetch collaborator data for all bylines
-          const bylines = data.sections
-            .filter(section => section.type === 'credits' && section.bylines)
-            .flatMap(section => section.bylines);
-          
-          const collaboratorPromises = bylines
-            .map(byline => {
-              if (!byline.id) {
-                console.warn('Bylines missing id');
-                return null;
-              }
-              return getCollaborator(byline.id)
-                .then(collaborator => {
-                  return collaborator;
-                })
-                .catch(error => {
-                  console.error('Error fetching collaborator');
-                  return null;
-                });
-            })
-            .filter(Boolean);
-
-          const collaboratorData = await Promise.all(collaboratorPromises);
-          
-          const collaboratorMap = collaboratorData.reduce((acc, collaborator) => {
-            if (collaborator) {
-              acc[collaborator.id] = collaborator;
-            }
-            return acc;
-          }, {});
-
-          setCollaborators(collaboratorMap);
-        } else {
+        const programData = await getProgram(id);
+        if (!programData) {
           setError('Program not found');
+          setLoading(false);
+          return;
         }
+
+        setProgram(programData);
+
+        // Fetch all collaborators mentioned in bylines
+        const collaboratorPromises = [];
+        const collaboratorIds = new Set();
+
+        // Collect all unique collaborator IDs from all sections
+        programData.sections.forEach(section => {
+          if (section.bylines) {
+            section.bylines.forEach(byline => {
+              collaboratorIds.add(byline.id);
+            });
+          }
+        });
+
+        // Fetch each collaborator
+        collaboratorIds.forEach(id => {
+          collaboratorPromises.push(getCollaborator(id));
+        });
+
+        const collaboratorResults = await Promise.all(collaboratorPromises);
+        const collaboratorMap = {};
+        collaboratorResults.forEach(collaborator => {
+          if (collaborator) {
+            collaboratorMap[collaborator.id] = collaborator;
+          }
+        });
+
+        setCollaborators(collaboratorMap);
+        setLoading(false);
       } catch (err) {
-        console.error('Error loading program');
-        setError('Error loading program');
-      } finally {
+        console.error('Error fetching program:', err);
+        setError('Failed to load program');
         setLoading(false);
       }
     };
@@ -75,132 +66,92 @@ export default function ViewProgram() {
     fetchProgram();
   }, [id]);
 
-  const handleImageUpload = (urlsByWidth) => {
-    console.log('Uploaded images:', urlsByWidth);
-    setUploadedImages(urlsByWidth);
+  const renderSection = (section) => {
+    switch (section.type) {
+      case 'text':
+        return <TextSection key={section.id} section={section} collaborators={collaborators} />;
+      case 'media':
+        switch (section.mediaType) {
+          case 'image':
+            return <ImageMedia key={section.id} section={section} collaborators={collaborators} />;
+          case 'gallery':
+            return <GalleryMedia key={section.id} section={section} collaborators={collaborators} />;
+          case 'video':
+            return <VideoMedia key={section.id} section={section} collaborators={collaborators} />;
+          default:
+            return null;
+        }
+      case 'credits':
+        return <CreditsSection key={section.id} section={section} collaborators={collaborators} />;
+      default:
+        return null;
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div>Loading...</div>
+      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading program...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div style={{ color: '#dc2626' }}>{error}</div>
+      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Error</h2>
+            <p className="text-gray-600">{error}</p>
+            <button
+              onClick={() => navigate('/')}
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              Return Home
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
+  if (!program) {
+    return null;
+  }
+
   return (
-    <div className="min-h-screen py-12">
-      <div className="container">
-        <div className="card">
-          {/* Header */}
-          <div className="mb-4">
-            <h1 className="text-center">
-              {program.title}
-            </h1>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+          <div className="px-4 py-5 sm:px-6">
+            <h1 className="text-3xl font-bold text-gray-900">{program.title}</h1>
             {program.subtitle && (
-              <h2 className="text-center text-gray-600">
-                {program.subtitle}
-              </h2>
+              <p className="mt-1 text-xl text-gray-500">{program.subtitle}</p>
             )}
           </div>
 
-          {/* Primary Image */}
           {program.primaryImageUrl && (
-            <div className="mb-8">
-              <img 
-                src={program.primaryImageUrl} 
+            <div className="px-4 py-5 sm:px-6">
+              <img
+                src={program.primaryImageUrl}
                 alt={program.title}
-                className="w-full h-auto rounded-lg"
+                className="w-full h-64 object-cover rounded-lg"
               />
             </div>
           )}
 
-          {/* Sections */}
-          <div className="space-y-8">
-            {program.sections?.map((section, index) => (
-              <div key={section.id || index} className="border-t pt-4">
-                <h3 className="text-xl font-bold mb-2">{section.title}</h3>
-                {section.subtitle && (
-                  <h4 className="text-lg text-gray-600 mb-4">{section.subtitle}</h4>
-                )}
-
-                {/* Section Content */}
-                {section.type === 'text' && section.content && (
-                  <div 
-                    className="prose max-w-none"
-                    dangerouslySetInnerHTML={{ 
-                      __html: DOMPurify.sanitize(section.content, sanitizeConfig)
-                    }}
-                  />
-                )}
-
-                {/* Media Section */}
-                {section.type === 'media' && section.mediaSource && (
-                  <div className="mt-4">
-                    {section.mediaType === 'image' && (
-                      <img 
-                        src={section.mediaSource} 
-                        alt={section.title}
-                        className="w-full h-auto rounded-lg"
-                      />
-                    )}
-                    {section.mediaType === 'video' && (
-                      <video 
-                        src={section.mediaSource} 
-                        controls
-                        className="w-full rounded-lg"
-                      />
-                    )}
-                    {section.mediaType === 'gallery' && (
-                      <div className="grid grid-cols-2 gap-4">
-                        {section.mediaSource.split(',').map((url, i) => (
-                          <img 
-                            key={i}
-                            src={url.trim()} 
-                            alt={`${section.title} - Image ${i + 1}`}
-                            className="w-full h-auto rounded-lg"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Credits Section */}
-                {section.type === 'credits' && section.bylines?.length > 0 && (
-                  <div className="space-y-4">
-                    {section.bylines.map((byline, bylineIndex) => {
-                      const collaborator = collaborators[byline.id];
-                      console.log('Rendering byline:', { byline, collaborator }); // Debug log
-                      return (
-                        <div key={bylineIndex} className="flex justify-between items-center">
-                          <span className="font-medium">{byline.role}: </span>
-                          <span>
-                            {collaborator ? (
-                              collaborator.creditedName || 
-                              `${collaborator.firstName || ''} ${collaborator.lastName || ''}`
-                            ) : (
-                              <span className="text-red-500">Collaborator not found</span>
-                            )}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className="border-t border-gray-200">
+            {program.sections.map(section => renderSection(section))}
           </div>
         </div>
       </div>
     </div>
   );
-} 
+};
+
+export default ViewProgram; 

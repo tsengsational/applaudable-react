@@ -5,9 +5,10 @@ import { storeImageMetadata, checkImageExists, updateImageUsage } from '../servi
 
 /**
  * Hook for handling image uploads with resizing
+ * @param {string} userId - User ID for storage path
  * @returns {Object} Upload handler and loading state
  */
-export const useImageUploader = () => {
+export const useImageUploader = (userId) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -26,12 +27,15 @@ export const useImageUploader = () => {
   /**
    * Handles file upload with resizing
    * @param {File} file - Image file to upload
-   * @param {string} userId - User ID for storage path
    * @returns {Promise<{ [width: string]: string }>} Map of width to download URL
    */
-  const handleFileUpload = async (file, userId) => {
+  const handleFileUpload = async (file) => {
     if (!file) {
       throw new Error('No file provided');
+    }
+
+    if (!userId) {
+      throw new Error('User ID is required for image upload');
     }
 
     if (!isValidImage(file)) {
@@ -44,6 +48,7 @@ export const useImageUploader = () => {
     try {
       // Generate image hash
       const imageHash = await generateImageHash(file);
+      console.log('Generated image hash:', imageHash);
       
       // Check if image already exists
       const existingImage = await checkImageExists(userId, imageHash);

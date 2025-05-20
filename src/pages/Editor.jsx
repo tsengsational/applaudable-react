@@ -439,6 +439,18 @@ export default function Editor() {
                     </div>
                   )}
 
+                  {section.type === SECTION_TYPES.MEDIA && section.mediaType === MEDIA_TYPES.IMAGE && (
+                    <div className="form-group">
+                      <label className="form-label">Image</label>
+                      <ImageUploader
+                        userId={currentUser.uid}
+                        onUpload={(urlsByWidth) => updateSection(section.id, { mediaSource: urlsByWidth['1280'] })}
+                        onDelete={() => updateSection(section.id, { mediaSource: '' })}
+                        existingImageUrl={section.mediaSource}
+                      />
+                    </div>
+                  )}
+
                   {section.type === SECTION_TYPES.MEDIA && (
                     <div className="form-group">
                       <label className="form-label">Media Source URL</label>

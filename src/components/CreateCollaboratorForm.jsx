@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { createCollaborator, generateUniqueId } from '../services/firestore';
+import { createCollaborator } from '../services/firestore';
+import { serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function CreateCollaboratorForm({ onSuccess, onCancel }) {
   const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
-    id: generateUniqueId(),
     firstName: '',
     lastName: '',
     creditedName: '',
@@ -55,14 +55,19 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel }) {
 
     try {
       const collaboratorData = {
-        ...formData,
-        userId: currentUser.uid
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        creditedName: formData.creditedName,
+        bio: formData.bio,
+        userId: currentUser.uid,
+        createdAt: serverTimestamp()
       };
-      const collaborator = await createCollaborator(collaboratorData);
-      onSuccess(collaborator);
+
+      const newCollaboratorId = await createCollaborator(collaboratorData);
+      onSuccess({ id: newCollaboratorId, ...collaboratorData });
     } catch (err) {
       console.error('Error creating collaborator:', err);
-      setError('Failed to create collaborator. Please try again.');
+      setError('Failed to create collaborator');
     } finally {
       setLoading(false);
     }

@@ -25,12 +25,8 @@ export const createCollaborator = async (collaboratorData) => {
       createdAt: serverTimestamp()
     });
     
-    // Get the newly created collaborator
-    const docSnap = await getDoc(docRef);
-    return {
-      id: docSnap.id,
-      ...docSnap.data()
-    };
+    // Return just the document ID
+    return docRef.id;
   } catch (error) {
     console.error('Error creating collaborator:', error);
     throw error;
@@ -39,7 +35,8 @@ export const createCollaborator = async (collaboratorData) => {
 
 export const getCollaborator = async (id) => {
   try {
-    console.log('Fetching collaborator with ID:', id);
+    console.log('Fetching collaborator...');
+    
     const docRef = doc(firestore, 'collaborators', id);
     const docSnap = await getDoc(docRef);
     
@@ -48,10 +45,10 @@ export const getCollaborator = async (id) => {
         id: docSnap.id,
         ...docSnap.data()
       };
-      console.log('Found collaborator:', collaborator);
       return collaborator;
     }
-    console.log('No collaborator found with ID:', id);
+    
+    console.log('No collaborator found');
     return null;
   } catch (error) {
     console.error('Error getting collaborator:', error);
@@ -111,10 +108,12 @@ export const updateCollaborator = async (id, collaboratorData) => {
 
 export const deleteCollaborator = async (id) => {
   try {
+    console.log('Attempting to delete collaborator with ID:', id);
     const docRef = doc(firestore, 'collaborators', id);
     await deleteDoc(docRef);
+    console.log('Successfully deleted collaborator');
   } catch (error) {
-    console.error('Error deleting collaborator:', error);
+    console.error('Error in deleteCollaborator:', error);
     throw error;
   }
 };
@@ -277,10 +276,4 @@ export const deleteProgram = async (id) => {
     console.error('Error deleting program:', error);
     throw error;
   }
-};
-
-export const generateUniqueId = () => {
-  const timestamp = Date.now().toString(36);
-  const randomStr = Math.random().toString(36).substring(2, 8);
-  return `${timestamp}-${randomStr}`;
 }; 

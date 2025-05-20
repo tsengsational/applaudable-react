@@ -26,7 +26,7 @@ export default function ViewProgram() {
       try {
         const data = await getProgram(id);
         if (data) {
-          console.log('Fetched program data:', data);
+          console.log('Loading program data...');
           setProgram(data);
           
           // Fetch collaborator data for all bylines
@@ -34,38 +34,38 @@ export default function ViewProgram() {
             .filter(section => section.type === 'credits' && section.bylines)
             .flatMap(section => section.bylines);
           
-          console.log('Found bylines:', bylines);
-          
           const collaboratorPromises = bylines
             .map(byline => {
               if (!byline.id) {
-                console.warn('Bylines missing id:', byline);
+                console.warn('Bylines missing id');
                 return null;
               }
-              console.log('Creating promise for collaborator ID:', byline.id);
-              return getCollaborator(byline.id);
+              return getCollaborator(byline.id)
+                .then(collaborator => {
+                  return collaborator;
+                })
+                .catch(error => {
+                  console.error('Error fetching collaborator');
+                  return null;
+                });
             })
             .filter(Boolean);
 
-          console.log('Collaborator promises:', collaboratorPromises);
           const collaboratorData = await Promise.all(collaboratorPromises);
-          console.log('Resolved collaborator data:', collaboratorData);
           
           const collaboratorMap = collaboratorData.reduce((acc, collaborator) => {
             if (collaborator) {
-              console.log('Adding collaborator to map:', collaborator);
               acc[collaborator.id] = collaborator;
             }
             return acc;
           }, {});
 
-          console.log('Final collaborator map:', collaboratorMap);
           setCollaborators(collaboratorMap);
         } else {
           setError('Program not found');
         }
       } catch (err) {
-        console.error('Error fetching program:', err);
+        console.error('Error loading program');
         setError('Error loading program');
       } finally {
         setLoading(false);

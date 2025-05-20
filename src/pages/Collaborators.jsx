@@ -126,6 +126,7 @@ export default function Collaborators() {
     if (!window.confirm('Are you sure you want to delete this collaborator?')) return;
 
     try {
+      console.log('Deleting collaborator with ID:', id);
       await deleteCollaborator(id);
       setCollaborators(prev => prev.filter(c => c.id !== id));
     } catch (err) {

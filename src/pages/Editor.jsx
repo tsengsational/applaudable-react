@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { createProgram, getUserCollaborators, generateUniqueId, getProgram, updateProgram } from '../services/firestore';
+import { createProgram, getUserCollaborators, getProgram, updateProgram } from '../services/firestore';
 import Modal from '../components/Modal';
 import CreateCollaboratorForm from '../components/CreateCollaboratorForm';
 import { ImageUploader } from '../components/ImageUploader';
@@ -33,7 +33,7 @@ export default function Editor() {
     primaryImageUrl: '',
     sections: [
       {
-        id: generateUniqueId(),
+        id: Date.now().toString(),
         type: SECTION_TYPES.TEXT,
         title: 'Welcome',
         subtitle: '',
@@ -155,7 +155,7 @@ export default function Editor() {
 
   const addSection = (type) => {
     const newSection = {
-      id: generateUniqueId(),
+      id: Date.now().toString(),
       type,
       title: '',
       subtitle: '',
@@ -203,7 +203,10 @@ export default function Editor() {
 
   const addByline = (sectionId, collaboratorId, role) => {
     updateSection(sectionId, {
-      bylines: [...program.sections.find(s => s.id === sectionId).bylines, { id: collaboratorId, role }]
+      bylines: [...program.sections.find(s => s.id === sectionId).bylines, { 
+        id: collaboratorId,
+        role 
+      }]
     });
   };
 

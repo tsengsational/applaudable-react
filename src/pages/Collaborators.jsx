@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { getUserCollaborators, createCollaborator, updateCollaborator, deleteCollaborator } from '../services/firestore';
+import CreateCollaboratorForm from '../components/CreateCollaboratorForm';
 
 export default function Collaborators() {
   const { currentUser } = useAuth();
@@ -8,20 +9,7 @@ export default function Collaborators() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingCollaborator, setEditingCollaborator] = useState(null);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    creditedName: '',
-    bio: '',
-    socialLinks: {
-      instagram: '',
-      website: '',
-      facebook: '',
-      twitter: '',
-      linkedin: ''
-    },
-    primaryImageUrl: ''
-  });
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     const fetchCollaborators = async () => {
@@ -41,85 +29,21 @@ export default function Collaborators() {
     fetchCollaborators();
   }, [currentUser]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name.startsWith('social.')) {
-      const platform = name.split('.')[1];
-      setFormData(prev => ({
-        ...prev,
-        socialLinks: {
-          ...prev.socialLinks,
-          [platform]: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
+  const handleCreateSuccess = async (newCollaborator) => {
     try {
-      const collaboratorData = {
-        ...formData,
-        userId: currentUser.uid
-      };
-
-      if (editingCollaborator) {
-        await updateCollaborator(editingCollaborator.id, collaboratorData);
-        setCollaborators(prev => 
-          prev.map(c => c.id === editingCollaborator.id ? { ...c, ...collaboratorData } : c)
-        );
-      } else {
-        const newCollaboratorId = await createCollaborator(collaboratorData);
-        setCollaborators(prev => [...prev, { id: newCollaboratorId, ...collaboratorData }]);
-      }
-
-      setFormData({
-        firstName: '',
-        lastName: '',
-        creditedName: '',
-        bio: '',
-        socialLinks: {
-          instagram: '',
-          website: '',
-          facebook: '',
-          twitter: '',
-          linkedin: ''
-        },
-        primaryImageUrl: ''
-      });
-      setEditingCollaborator(null);
+      // Fetch the complete updated list of collaborators
+      const updatedCollaborators = await getUserCollaborators(currentUser.uid);
+      setCollaborators(updatedCollaborators);
+      setShowCreateForm(false);
     } catch (err) {
-      console.error('Error saving collaborator:', err);
-      setError('Failed to save collaborator');
-    } finally {
-      setLoading(false);
+      console.error('Error handling new collaborator:', err);
+      setError('Failed to add new collaborator');
     }
   };
 
   const handleEdit = (collaborator) => {
     setEditingCollaborator(collaborator);
-    setFormData({
-      firstName: collaborator.firstName,
-      lastName: collaborator.lastName,
-      creditedName: collaborator.creditedName || '',
-      bio: collaborator.bio,
-      socialLinks: collaborator.socialLinks || {
-        instagram: '',
-        website: '',
-        facebook: '',
-        twitter: '',
-        linkedin: ''
-      },
-      primaryImageUrl: collaborator.primaryImageUrl
-    });
+    setShowCreateForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -157,155 +81,30 @@ export default function Collaborators() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Collaborator Form */}
           <div className="card">
-            <h2 className="text-xl font-bold mb-4">
-              {editingCollaborator ? 'Edit Collaborator' : 'Add New Collaborator'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-group">
-                  <label htmlFor="firstName" className="form-label">First Name</label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="lastName" className="form-label">Last Name</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="creditedName" className="form-label">Credited Name (Optional)</label>
-                <input
-                  type="text"
-                  id="creditedName"
-                  name="creditedName"
-                  value={formData.creditedName}
-                  onChange={handleInputChange}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="bio" className="form-label">Bio</label>
-                <textarea
-                  id="bio"
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  rows="4"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="primaryImageUrl" className="form-label">Primary Image URL</label>
-                <input
-                  type="url"
-                  id="primaryImageUrl"
-                  name="primaryImageUrl"
-                  value={formData.primaryImageUrl}
-                  onChange={handleInputChange}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Social Links</label>
-                <div className="space-y-2">
-                  <input
-                    type="url"
-                    name="social.instagram"
-                    value={formData.socialLinks.instagram}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="Instagram URL"
-                  />
-                  <input
-                    type="url"
-                    name="social.website"
-                    value={formData.socialLinks.website}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="Website URL"
-                  />
-                  <input
-                    type="url"
-                    name="social.facebook"
-                    value={formData.socialLinks.facebook}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="Facebook URL"
-                  />
-                  <input
-                    type="url"
-                    name="social.twitter"
-                    value={formData.socialLinks.twitter}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="Twitter URL"
-                  />
-                  <input
-                    type="url"
-                    name="social.linkedin"
-                    value={formData.socialLinks.linkedin}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="LinkedIn URL"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-4">
-                {editingCollaborator && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingCollaborator(null);
-                      setFormData({
-                        firstName: '',
-                        lastName: '',
-                        creditedName: '',
-                        bio: '',
-                        socialLinks: {
-                          instagram: '',
-                          website: '',
-                          facebook: '',
-                          twitter: '',
-                          linkedin: ''
-                        },
-                        primaryImageUrl: ''
-                      });
-                    }}
-                    className="btn btn-secondary"
-                  >
-                    Cancel
-                  </button>
-                )}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">
+                {editingCollaborator ? 'Edit Collaborator' : 'Add New Collaborator'}
+              </h2>
+              {!showCreateForm && (
                 <button
-                  type="submit"
-                  disabled={loading}
+                  onClick={() => setShowCreateForm(true)}
                   className="btn btn-primary"
                 >
-                  {loading ? 'Saving...' : editingCollaborator ? 'Update' : 'Add'} Collaborator
+                  Add New Collaborator
                 </button>
-              </div>
-            </form>
+              )}
+            </div>
+
+            {showCreateForm && (
+              <CreateCollaboratorForm
+                onSuccess={handleCreateSuccess}
+                onCancel={() => {
+                  setShowCreateForm(false);
+                  setEditingCollaborator(null);
+                }}
+                initialData={editingCollaborator}
+              />
+            )}
           </div>
 
           {/* Collaborators List */}

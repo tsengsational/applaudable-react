@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { createCollaborator } from '../services/firestore';
+import React, { useState, useEffect } from 'react';
+import { createCollaborator, updateCollaborator } from '../services/firestore';
 import { serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function CreateCollaboratorForm({ onSuccess, onCancel }) {
+export default function CreateCollaboratorForm({ onSuccess, onCancel, initialData }) {
   const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -22,6 +22,26 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        firstName: initialData.firstName || '',
+        lastName: initialData.lastName || '',
+        creditedName: initialData.creditedName || '',
+        bio: initialData.bio || '',
+        email: initialData.email || '',
+        phone: initialData.phone || '',
+        website: initialData.website || '',
+        socialLinks: initialData.socialLinks || {
+          instagram: '',
+          twitter: '',
+          linkedin: '',
+          facebook: ''
+        }
+      });
+    }
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,15 +79,24 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel }) {
         lastName: formData.lastName,
         creditedName: formData.creditedName,
         bio: formData.bio,
+        email: formData.email,
+        phone: formData.phone,
+        website: formData.website,
+        socialLinks: formData.socialLinks,
         userId: currentUser.uid,
         createdAt: serverTimestamp()
       };
 
-      const newCollaboratorId = await createCollaborator(collaboratorData);
-      onSuccess({ id: newCollaboratorId, ...collaboratorData });
+      if (initialData) {
+        await updateCollaborator(initialData.id, collaboratorData);
+        onSuccess({ id: initialData.id, ...collaboratorData });
+      } else {
+        const newCollaboratorId = await createCollaborator(collaboratorData);
+        onSuccess({ id: newCollaboratorId, ...collaboratorData });
+      }
     } catch (err) {
-      console.error('Error creating collaborator:', err);
-      setError('Failed to create collaborator');
+      console.error('Error saving collaborator:', err);
+      setError('Failed to save collaborator');
     } finally {
       setLoading(false);
     }
@@ -239,7 +268,7 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel }) {
           disabled={loading}
           className="btn btn-primary"
         >
-          {loading ? 'Creating...' : 'Create Collaborator'}
+          {loading ? 'Saving...' : initialData ? 'Update' : 'Create'} Collaborator
         </button>
       </div>
     </form>

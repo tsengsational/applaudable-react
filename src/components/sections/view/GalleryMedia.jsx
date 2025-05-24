@@ -1,55 +1,71 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import Modal from '../../../components/Modal';
 
 export const GalleryMedia = ({ section, collaborators }) => {
   const [selectedImage, setSelectedImage] = useState(null);
 
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  // Get images from either images or galleryImages property
+  const images = section.images || section.galleryImages || [];
+
+  if (!images.length) {
+    return null;
+  }
+
   return (
     <div className="gallery-media">
       <h2 className="gallery-media__title">{section.title}</h2>
-      {section.subtitle && <h3 className="gallery-media__subtitle">{section.subtitle}</h3>}
-      
+      {section.subtitle && (
+        <h3 className="gallery-media__subtitle">{section.subtitle}</h3>
+      )}
       <div className="gallery-media__content">
-        {section.galleryImages && section.galleryImages.length > 0 && (
-          <div className="gallery-media__gallery">
-            <div className="gallery-media__grid">
-              {section.galleryImages.map((image, index) => (
-                <div 
-                  key={index} 
-                  className="gallery-media__item"
-                  onClick={() => setSelectedImage(image)}
-                >
-                  <img 
-                    src={image} 
-                    alt={`Gallery image ${index + 1}`}
-                    className="gallery-media__image"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="gallery-media__grid">
+          {images.map((image, index) => {
+            // Handle both string URLs and object formats
+            const imageUrl = typeof image === 'string' ? image : image.url;
+            const imageAlt = typeof image === 'string' ? `Gallery image ${index + 1}` : (image.alt || `Gallery image ${index + 1}`);
+            const imageCaption = typeof image === 'string' ? null : image.caption;
 
-        {selectedImage && (
-          <div 
-            className="gallery-media__modal-overlay"
-            onClick={() => setSelectedImage(null)}
-          >
-            <div className="gallery-media__modal-content">
-              <img 
-                src={selectedImage} 
-                alt="Selected gallery image"
-                className="gallery-media__modal-image"
-              />
-              <button 
-                className="gallery-media__modal-close"
-                onClick={() => setSelectedImage(null)}
+            return (
+              <div
+                key={index}
+                className="gallery-media__item"
+                onClick={() => handleImageClick({ url: imageUrl, alt: imageAlt, caption: imageCaption })}
               >
-                ×
-              </button>
-            </div>
-          </div>
-        )}
+                <img
+                  src={imageUrl}
+                  alt={imageAlt}
+                  className="gallery-media__image"
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
+
+      {selectedImage && (
+        <Modal
+          isOpen={!!selectedImage}
+          onClose={() => setSelectedImage(null)}
+          title={selectedImage.alt || 'Gallery Image'}
+          className="gallery-media__modal"
+        >
+          <div className="gallery-media__modal-content">
+            <img
+              src={selectedImage.url}
+              alt={selectedImage.alt || 'Gallery image'}
+              className="gallery-media__modal-image"
+            />
+            {selectedImage.caption && (
+              <p className="gallery-media__modal-caption">{selectedImage.caption}</p>
+            )}
+          </div>
+        </Modal>
+      )}
 
       {section.bylines && section.bylines.length > 0 && (
         <div className="gallery-media__bylines">
@@ -91,4 +107,46 @@ export const GalleryMedia = ({ section, collaborators }) => {
       )}
     </div>
   );
+};
+
+GalleryMedia.propTypes = {
+  section: PropTypes.shape({
+    title: PropTypes.string,
+    subtitle: PropTypes.string,
+    images: PropTypes.arrayOf(
+      PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.shape({
+          url: PropTypes.string.isRequired,
+          alt: PropTypes.string,
+          caption: PropTypes.string
+        })
+      ])
+    ),
+    galleryImages: PropTypes.arrayOf(
+      PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.shape({
+          url: PropTypes.string.isRequired,
+          alt: PropTypes.string,
+          caption: PropTypes.string
+        })
+      ])
+    ),
+    bylines: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        role: PropTypes.string.isRequired,
+        collaborators: PropTypes.arrayOf(PropTypes.string)
+      })
+    )
+  }).isRequired,
+  collaborators: PropTypes.objectOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      firstName: PropTypes.string.isRequired,
+      lastName: PropTypes.string.isRequired,
+      creditedName: PropTypes.string
+    })
+  ).isRequired
 }; 

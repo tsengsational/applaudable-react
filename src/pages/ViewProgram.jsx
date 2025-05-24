@@ -6,6 +6,8 @@ import { ImageMedia } from '../components/sections/view/ImageMedia';
 import { GalleryMedia } from '../components/sections/view/GalleryMedia';
 import { VideoMedia } from '../components/sections/view/VideoMedia';
 import { CreditsSection } from '../components/sections/view/CreditsSection';
+import Modal from '../components/Modal';
+import CollaboratorProfile from '../components/CollaboratorProfile';
 import '../styles/pages/ViewProgram.scss';
 
 export const ViewProgram = () => {
@@ -15,6 +17,7 @@ export const ViewProgram = () => {
   const [collaborators, setCollaborators] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCollaborator, setSelectedCollaborator] = useState(null);
 
   useEffect(() => {
     const fetchProgram = async () => {
@@ -97,6 +100,19 @@ export const ViewProgram = () => {
     }
   };
 
+  const handleCollaboratorClick = (collaborator) => {
+    const hasAdditionalInfo = collaborator.bio || 
+      collaborator.email || 
+      collaborator.phone || 
+      collaborator.website || 
+      collaborator.primaryImageUrl ||
+      Object.values(collaborator.socialLinks || {}).some(link => link);
+
+    if (hasAdditionalInfo) {
+      setSelectedCollaborator(collaborator);
+    }
+  };
+
   if (loading) {
     return (
       <div className="view-program view-program--loading">
@@ -159,6 +175,16 @@ export const ViewProgram = () => {
           </div>
         </div>
       </div>
+
+      {selectedCollaborator && (
+        <Modal
+          isOpen={!!selectedCollaborator}
+          onClose={() => setSelectedCollaborator(null)}
+          title="Collaborator Profile"
+        >
+          <CollaboratorProfile collaborator={selectedCollaborator} />
+        </Modal>
+      )}
     </div>
   );
 };

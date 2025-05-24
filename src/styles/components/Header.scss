@@ -1,0 +1,54 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.header {
+  background-color: v.$white;
+  box-shadow: v.$shadow;
+  padding: v.$spacing-4 0;
+
+  &__container {
+    @include m.container;
+    @include m.flex-between;
+  }
+
+  &__logo {
+    font-size: v.$font-size-xl;
+    font-weight: bold;
+    color: v.$text-primary;
+    text-decoration: none;
+  }
+
+  &__nav {
+    @include m.flex-between;
+    gap: v.$spacing-4;
+  }
+
+  &__link {
+    color: v.$text-primary;
+    text-decoration: none;
+    font-weight: 500;
+    padding: v.$spacing-2;
+    border-radius: v.$border-radius-md;
+    transition: all 0.2s;
+
+    &:hover {
+      color: v.$primary;
+      background-color: rgba(v.$primary, 0.1);
+    }
+
+    &--active {
+      color: v.$primary;
+      background-color: rgba(v.$primary, 0.1);
+    }
+  }
+
+  &__button {
+    @include m.button-base;
+    background-color: v.$primary;
+    color: v.$white;
+
+    &:hover {
+      background-color: v.$primary-dark;
+    }
+  }
+}

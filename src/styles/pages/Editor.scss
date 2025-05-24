@@ -1,6 +1,94 @@
 @use '../base/variables' as v;
 @use '../base/mixins' as m;
 
+.editor {
+  padding: v.$spacing-8 0;
+
+  &__header {
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__title {
+    font-size: v.$font-size-3xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__subtitle {
+    font-size: v.$font-size-xl;
+    color: v.$text-muted;
+  }
+
+  &__toolbar {
+    display: flex;
+    gap: v.$spacing-4;
+    margin-bottom: v.$spacing-6;
+    padding: v.$spacing-4;
+    background-color: v.$white;
+    border: 1px solid v.$border;
+    border-radius: v.$border-radius-md;
+  }
+
+  &__button {
+    @include m.button-base;
+    background-color: v.$primary;
+    color: v.$white;
+
+    &:hover {
+      background-color: v.$primary-dark;
+    }
+
+    &--secondary {
+      background-color: v.$background;
+      color: v.$text-primary;
+
+      &:hover {
+        background-color: v.$border;
+      }
+    }
+  }
+
+  &__content {
+    background-color: v.$white;
+    border: 1px solid v.$border;
+    border-radius: v.$border-radius-md;
+    padding: v.$spacing-4;
+    min-height: 400px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: v.$spacing-4;
+    margin-top: v.$spacing-6;
+  }
+
+  &__save {
+    @include m.button-base;
+    background-color: v.$primary;
+    color: v.$white;
+
+    &:hover {
+      background-color: v.$primary-dark;
+    }
+  }
+
+  &__cancel {
+    @include m.button-base;
+    background-color: v.$background;
+    color: v.$text-primary;
+
+    &:hover {
+      background-color: v.$border;
+    }
+  }
+
+  &__error {
+    color: v.$error;
+    margin-top: v.$spacing-2;
+    font-size: v.$font-size-sm;
+  }
+}
+
 .page {
   padding: v.$spacing-8;
 }
@@ -8,11 +96,6 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.title {
-  font-size: v.$font-size-3xl;
-  margin-bottom: v.$spacing-8;
 }
 
 .error {
@@ -57,10 +140,16 @@
 }
 
 .button {
-  @include m.button;
+  @include m.button-base;
   
   &.danger-button {
-    @include m.button(v.$error, white, darken(v.$error, 10%));
+    @include m.button-base;
+    background-color: v.$error;
+    color: v.$white;
+
+    &:hover {
+      background-color: darken(v.$error, 10%);
+    }
   }
 }
 

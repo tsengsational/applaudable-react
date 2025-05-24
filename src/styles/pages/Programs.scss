@@ -1,0 +1,92 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.programs {
+  padding: v.$spacing-8 0;
+
+  &__header {
+    @include m.flex-between;
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__title {
+    font-size: v.$font-size-3xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__subtitle {
+    font-size: v.$font-size-xl;
+    color: v.$text-muted;
+  }
+
+  &__create {
+    @include m.button-base;
+    background-color: v.$primary;
+    color: v.$white;
+
+    &:hover {
+      background-color: v.$primary-dark;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: v.$spacing-6;
+  }
+
+  &__card {
+    @include m.card;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
+
+  &__image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-top-left-radius: v.$border-radius-md;
+    border-top-right-radius: v.$border-radius-md;
+  }
+
+  &__content {
+    padding: v.$spacing-4;
+  }
+
+  &__name {
+    font-size: v.$font-size-xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-2;
+    color: v.$text-primary;
+  }
+
+  &__description {
+    color: v.$text-secondary;
+    margin-bottom: v.$spacing-4;
+    @include m.truncate;
+  }
+
+  &__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: v.$text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: v.$spacing-8;
+    color: v.$text-muted;
+  }
+
+  &__error {
+    text-align: center;
+    padding: v.$spacing-8;
+    color: v.$error;
+  }
+} 

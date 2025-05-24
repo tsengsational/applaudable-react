@@ -1,0 +1,86 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.image-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$spacing-4;
+  margin-bottom: v.$spacing-6;
+
+  &__item {
+    position: relative;
+    width: calc(33.333% - v.$spacing-4);
+    aspect-ratio: 1;
+    border-radius: v.$border-radius-md;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+
+    &--selected {
+      border: 2px solid v.$primary;
+    }
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &__button {
+    background-color: v.$white;
+    color: v.$text-primary;
+    border: none;
+    padding: v.$spacing-2 v.$spacing-4;
+    border-radius: v.$border-radius-md;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: v.$primary;
+      color: v.$white;
+    }
+  }
+
+  &__name {
+    color: v.$white;
+    font-size: v.$font-size-sm;
+    text-align: center;
+    padding: v.$spacing-2;
+  }
+
+  &__loading,
+  &__error,
+  &__empty {
+    text-align: center;
+    padding: v.$spacing-4;
+    color: v.$text-muted;
+  }
+
+  &__error {
+    color: v.$error;
+  }
+} 

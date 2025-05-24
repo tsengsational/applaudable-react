@@ -1,0 +1,63 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: v.$z-index-modal;
+
+  &__content {
+    background-color: v.$white;
+    border-radius: v.$border-radius-lg;
+    padding: v.$spacing-6;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  &__header {
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__title {
+    font-size: v.$font-size-xl;
+    font-weight: bold;
+    color: v.$text-primary;
+  }
+
+  &__close {
+    position: absolute;
+    top: v.$spacing-4;
+    right: v.$spacing-4;
+    background: none;
+    border: none;
+    color: v.$text-muted;
+    cursor: pointer;
+    padding: v.$spacing-2;
+    border-radius: v.$border-radius-full;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: v.$background;
+      color: v.$text-primary;
+    }
+  }
+
+  &__body {
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: v.$spacing-4;
+  }
+} 

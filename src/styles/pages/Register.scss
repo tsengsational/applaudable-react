@@ -1,0 +1,101 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.register {
+  @include m.flex-center;
+  min-height: 100vh;
+  padding: v.$spacing-8 0;
+  background-color: v.$background;
+
+  &__container {
+    width: 100%;
+    max-width: 400px;
+    padding: v.$spacing-8;
+    background-color: v.$white;
+    border-radius: v.$border-radius-md;
+    box-shadow: v.$shadow;
+  }
+
+  &__header {
+    text-align: center;
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__title {
+    font-size: v.$font-size-3xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
+    color: v.$text-primary;
+  }
+
+  &__subtitle {
+    font-size: v.$font-size-lg;
+    color: v.$text-muted;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+  }
+
+  &__form-group {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-2;
+  }
+
+  &__label {
+    font-weight: 500;
+    color: v.$text-primary;
+  }
+
+  &__input {
+    width: 100%;
+    padding: v.$spacing-3;
+    border: 1px solid v.$border;
+    border-radius: v.$border-radius-md;
+    font-size: v.$font-size-base;
+    color: v.$text-primary;
+    background-color: v.$white;
+
+    &:focus {
+      outline: none;
+      border-color: v.$primary;
+      box-shadow: 0 0 0 2px v.$primary-light;
+    }
+  }
+
+  &__submit {
+    @include m.button-base;
+    background-color: v.$primary;
+    color: v.$white;
+    margin-top: v.$spacing-4;
+
+    &:hover {
+      background-color: v.$primary-dark;
+    }
+  }
+
+  &__error {
+    color: v.$error;
+    font-size: v.$font-size-sm;
+    margin-top: v.$spacing-2;
+  }
+
+  &__footer {
+    text-align: center;
+    margin-top: v.$spacing-6;
+    color: v.$text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__link {
+    color: v.$primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+} 

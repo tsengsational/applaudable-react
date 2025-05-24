@@ -1,68 +1,71 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
 .page {
   min-height: 100vh;
-  padding: 2rem 0;
+  padding: v.$spacing-8 0;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 v.$spacing-4;
 }
 
 .program {
   &-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: v.$spacing-8;
   }
 
   &-title {
-    font-size: 2.5rem;
+    font-size: v.$font-size-4xl;
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    margin-bottom: v.$spacing-2;
   }
 
   &-subtitle {
-    font-size: 1.5rem;
-    color: #666;
+    font-size: v.$font-size-2xl;
+    color: v.$text-secondary;
   }
 
   &-image {
-    margin-bottom: 2rem;
+    margin-bottom: v.$spacing-8;
     
     .primary-image {
       width: 100%;
       height: auto;
-      border-radius: 0.5rem;
+      border-radius: v.$border-radius-md;
     }
   }
 
   &-sections {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: v.$spacing-8;
   }
 }
 
 .section {
-  padding: 1.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background-color: white;
+  padding: v.$spacing-6;
+  border: 1px solid v.$border;
+  border-radius: v.$border-radius-md;
+  background-color: v.$white;
 
   &-title {
-    font-size: 1.5rem;
+    font-size: v.$font-size-2xl;
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    margin-bottom: v.$spacing-2;
   }
 
   &-subtitle {
-    font-size: 1.25rem;
-    color: #666;
-    margin-bottom: 1rem;
+    font-size: v.$font-size-xl;
+    color: v.$text-secondary;
+    margin-bottom: v.$spacing-4;
   }
 
   &-content {
-    margin-bottom: 1rem;
+    margin-bottom: v.$spacing-4;
   }
 }
 
@@ -78,7 +81,7 @@
   .section-image {
     width: 100%;
     height: auto;
-    border-radius: 0.5rem;
+    border-radius: v.$border-radius-md;
   }
 }
 
@@ -87,7 +90,7 @@
   &-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
+    gap: v.$spacing-4;
   }
 
   &-item {
@@ -100,10 +103,10 @@
   }
 
   &-image {
+    @include m.aspect-ratio(1, 1);
     width: 100%;
-    height: 200px;
     object-fit: cover;
-    border-radius: 0.5rem;
+    border-radius: v.$border-radius-md;
   }
 }
 
@@ -118,7 +121,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: v.$z-index-modal-backdrop;
 }
 
 .modal-content {
@@ -137,20 +140,20 @@
   position: absolute;
   top: -2rem;
   right: -2rem;
-  background: white;
+  background: v.$white;
   border: none;
-  border-radius: 50%;
+  border-radius: v.$border-radius-full;
   width: 2rem;
   height: 2rem;
-  font-size: 1.5rem;
+  font-size: v.$font-size-xl;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  color: v.$text-secondary;
 
   &:hover {
-    background: #f3f4f6;
+    background: v.$background;
   }
 }
 
@@ -167,7 +170,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    border-radius: 0.5rem;
+    border-radius: v.$border-radius-md;
   }
 }
 
@@ -175,44 +178,44 @@
 .credits-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: v.$spacing-2;
 }
 
 .credit-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
-  background-color: #f9fafb;
-  border-radius: 0.25rem;
+  padding: v.$spacing-2;
+  background-color: v.$background;
+  border-radius: v.$border-radius-sm;
 
   .role {
     font-weight: 500;
   }
 
   .name {
-    color: #666;
+    color: v.$text-secondary;
   }
 }
 
 // Bylines (shared across sections)
 .bylines {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  margin-top: v.$spacing-4;
+  padding-top: v.$spacing-4;
+  border-top: 1px solid v.$border;
 
   .byline {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: v.$spacing-2;
 
     .role {
       font-weight: 500;
     }
 
     .name {
-      color: #666;
+      color: v.$text-secondary;
     }
   }
 }
@@ -220,20 +223,128 @@
 // Loading and Error States
 .loading {
   text-align: center;
-  font-size: 1.25rem;
-  color: #666;
+  font-size: v.$font-size-xl;
+  color: v.$text-secondary;
 }
 
 .error-message {
   text-align: center;
-  padding: 2rem;
-  background-color: #fee2e2;
-  border-radius: 0.5rem;
-  color: #dc2626;
+  padding: v.$spacing-8;
+  background-color: v.$error-light;
+  border-radius: v.$border-radius-md;
+  color: v.$error;
 
   h2 {
-    font-size: 1.5rem;
+    font-size: v.$font-size-2xl;
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    margin-bottom: v.$spacing-2;
+  }
+}
+
+.view-program {
+  padding: v.$spacing-8 0;
+
+  &__header {
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__title {
+    font-size: v.$font-size-3xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-2;
+  }
+
+  &__meta {
+    color: v.$text-muted;
+    font-size: v.$font-size-sm;
+  }
+
+  &__content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  &__section {
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__section-title {
+    font-size: v.$font-size-xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__image {
+    width: 100%;
+    height: auto;
+    border-radius: v.$border-radius-md;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: v.$spacing-4;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__gallery-item {
+    position: relative;
+    border-radius: v.$border-radius-md;
+    overflow: hidden;
+    @include m.aspect-ratio(1, 1);
+    cursor: pointer;
+
+    &:hover {
+      .view-program__gallery-overlay {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  &__video {
+    width: 100%;
+    border-radius: v.$border-radius-md;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__text {
+    color: v.$text-primary;
+    line-height: 1.6;
+
+    p {
+      margin-bottom: v.$spacing-4;
+    }
+  }
+
+  &__loading,
+  &__error {
+    text-align: center;
+    padding: v.$spacing-8;
+    color: v.$text-muted;
+  }
+
+  &__error {
+    color: v.$error;
   }
 } 

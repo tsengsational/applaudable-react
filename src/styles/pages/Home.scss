@@ -1,0 +1,59 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.home {
+  &__hero {
+    text-align: center;
+    padding: v.$spacing-12 0;
+    background-color: v.$white;
+  }
+
+  &__title {
+    font-size: v.$font-size-4xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__subtitle {
+    font-size: v.$font-size-xl;
+    color: v.$text-muted;
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__cta {
+    @include m.button-base;
+    background-color: v.$primary;
+    color: v.$white;
+    font-size: v.$font-size-lg;
+    padding: v.$spacing-3 v.$spacing-6;
+
+    &:hover {
+      background-color: v.$primary-dark;
+    }
+  }
+
+  &__features {
+    padding: v.$spacing-12 0;
+  }
+
+  &__feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: v.$spacing-8;
+  }
+
+  &__feature {
+    text-align: center;
+    padding: v.$spacing-6;
+  }
+
+  &__feature-title {
+    font-size: v.$font-size-xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__feature-description {
+    color: v.$text-muted;
+  }
+} 

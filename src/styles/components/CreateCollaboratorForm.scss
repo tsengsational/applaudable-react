@@ -1,0 +1,70 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.collaborator-form {
+  max-width: 600px;
+  margin: 0 auto;
+
+  &__group {
+    margin-bottom: v.$spacing-6;
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: v.$spacing-2;
+    color: v.$text-primary;
+    font-weight: 500;
+  }
+
+  &__input {
+    width: 100%;
+    padding: v.$spacing-3;
+    border: 1px solid v.$border;
+    border-radius: v.$border-radius-md;
+    font-size: v.$font-size-base;
+    color: v.$text-primary;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: v.$primary;
+      box-shadow: 0 0 0 2px rgba(v.$primary, 0.1);
+    }
+
+    &--error {
+      border-color: v.$error;
+    }
+  }
+
+  &__textarea {
+    @extend .collaborator-form__input;
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  &__error {
+    color: v.$error;
+    font-size: v.$font-size-sm;
+    margin-top: v.$spacing-2;
+  }
+
+  &__submit {
+    background-color: v.$primary;
+    color: v.$white;
+    border: none;
+    padding: v.$spacing-3 v.$spacing-6;
+    border-radius: v.$border-radius-md;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: v.$primary-dark;
+    }
+
+    &:disabled {
+      background-color: v.$text-muted;
+      cursor: not-allowed;
+    }
+  }
+} 

@@ -1,0 +1,33 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.nav {
+  &__list {
+    @include m.flex-between;
+    list-style: none;
+    gap: v.$spacing-4;
+  }
+
+  &__item {
+    position: relative;
+  }
+
+  &__link {
+    color: v.$text-primary;
+    text-decoration: none;
+    font-weight: 500;
+    padding: v.$spacing-2;
+    border-radius: v.$border-radius-md;
+    transition: all 0.2s;
+
+    &:hover {
+      color: v.$primary;
+      background-color: rgba(v.$primary, 0.1);
+    }
+
+    &--active {
+      color: v.$primary;
+      background-color: rgba(v.$primary, 0.1);
+    }
+  }
+} 

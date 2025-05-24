@@ -1,0 +1,98 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+// Reset
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// Base styles
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: v.$font-family-base;
+  line-height: 1.5;
+  color: v.$text-primary;
+  background-color: v.$background;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+p {
+  margin: 0 0 v.$spacing-4;
+}
+
+a {
+  color: v.$primary;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: v.$primary-dark;
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// Lists
+ul, ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Forms
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+// Tables
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+// Code
+code {
+  font-family: monospace;
+  font-size: 0.9em;
+  padding: 0.2em 0.4em;
+  background-color: v.$background;
+  border-radius: v.$border-radius-sm;
+}
+
+// Selection
+::selection {
+  background-color: v.$primary;
+  color: white;
+} 

@@ -1,96 +1,97 @@
-@import 'variables';
-@import 'mixins';
+@use 'base/variables' as v;
+@use 'base/mixins' as m;
+@use 'base/base';
 
-// Reset and base styles
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+// Component styles
+@use 'components/Header';
+@use 'components/Navigation';
+@use 'components/Modal';
+@use 'components/ImageSelector';
+@use 'components/ImageUploader';
+@use 'components/CreateCollaboratorForm';
 
-body {
-  font-family: $font-family;
-  line-height: 1.5;
-  background-color: $background-color;
-  color: $text-color;
-}
+// Section styles
+@use 'components/sections/TextSection';
+@use 'components/sections/MediaSection';
+@use 'components/sections/ImageMedia';
+@use 'components/sections/GalleryMedia';
+@use 'components/sections/VideoMedia';
+
+// Pages
+@use 'pages/Home';
+@use 'pages/Programs';
+@use 'pages/CreateProgram';
+@use 'pages/ViewProgram';
+@use 'pages/Collaborators';
+@use 'pages/CreateCollaborator';
+@use 'pages/ViewCollaborator';
+@use 'pages/Login';
+@use 'pages/Register';
+@use 'pages/NotFound';
 
 // Layout
 .container {
-  @include container;
+  @include m.container;
 }
 
 .min-h-screen {
   min-height: 100vh;
 }
 
-// Typography
-h1 {
-  font-size: $font-size-4xl;
-  font-weight: bold;
-  margin-bottom: $spacing-4;
-}
-
-h2 {
-  font-size: $font-size-3xl;
-  font-weight: bold;
-  margin-bottom: $spacing-3;
-}
-
 // Buttons
 .btn {
-  @include button-base;
+  @include m.button-base;
 }
 
 .btn-primary {
-  background-color: $primary-color;
-  color: $white;
+  background-color: v.$primary;
+  color: white;
 
   &:hover {
-    background-color: $primary-hover;
+    background-color: v.$primary-dark;
   }
 }
 
 .btn-secondary {
-  background-color: $white;
-  color: $text-light;
-  border: 1px solid $border-color;
+  background-color: white;
+  color: v.$text-muted;
+  border: 1px solid v.$border;
 
   &:hover {
-    background-color: $background-color;
+    background-color: v.$background;
   }
 }
 
 // Forms
 .form-group {
-  margin-bottom: $spacing-4;
+  margin-bottom: v.$spacing-4;
 }
 
 .form-label {
   display: block;
-  font-size: $font-size-sm;
+  font-size: v.$font-size-sm;
   font-weight: 500;
-  color: $text-light;
-  margin-bottom: $spacing-2;
+  color: v.$text-muted;
+  margin-bottom: v.$spacing-2;
 }
 
 .form-input {
   width: 100%;
-  padding: $spacing-2;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-sm;
-  background-color: $white;
+  padding: v.$spacing-2;
+  border: 1px solid v.$border;
+  border-radius: v.$border-radius-sm;
+  background-color: white;
 
   &:focus {
     outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    border-color: v.$primary;
+    box-shadow: 0 0 0 3px rgba(v.$primary, 0.1);
   }
 }
 
 // Cards
 .card {
-  @include card;
+  @include m.card;
 }
 
 // Utilities
@@ -103,7 +104,7 @@ h2 {
 }
 
 .flex-col {
-  @include flex-col;
+  @include m.flex-col;
 }
 
 .items-center {
@@ -115,41 +116,41 @@ h2 {
 }
 
 .space-y-4 > * + * {
-  margin-top: $spacing-4;
+  margin-top: v.$spacing-4;
 }
 
 .space-x-4 > * + * {
-  margin-left: $spacing-4;
+  margin-left: v.$spacing-4;
 }
 
 .mt-4 {
-  margin-top: $spacing-4;
+  margin-top: v.$spacing-4;
 }
 
 .mb-4 {
-  margin-bottom: $spacing-4;
+  margin-bottom: v.$spacing-4;
 }
 
 .py-12 {
-  padding-top: $spacing-12;
-  padding-bottom: $spacing-12;
+  padding-top: v.$spacing-12;
+  padding-bottom: v.$spacing-12;
 }
 
 // Responsive utilities
-@include responsive(sm) {
+@include m.media-up(sm) {
   .container {
-    padding: 0 $spacing-6;
+    padding: 0 v.$spacing-6;
   }
 }
 
-@include responsive(md) {
+@include m.media-up(md) {
   .container {
-    padding: 0 $spacing-8;
+    padding: 0 v.$spacing-8;
   }
 }
 
-@include responsive(lg) {
+@include m.media-up(lg) {
   .container {
-    padding: 0 $spacing-12;
+    padding: 0 v.$spacing-12;
   }
 } 

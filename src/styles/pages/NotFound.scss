@@ -1,0 +1,41 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.not-found {
+  @include m.flex-center;
+  min-height: 100vh;
+  padding: v.$spacing-8 0;
+  background-color: v.$background;
+
+  &__container {
+    text-align: center;
+    padding: v.$spacing-8;
+    background-color: v.$white;
+    border-radius: v.$border-radius-md;
+    box-shadow: v.$shadow;
+  }
+
+  &__title {
+    font-size: v.$font-size-4xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
+    color: v.$text-primary;
+  }
+
+  &__message {
+    font-size: v.$font-size-xl;
+    color: v.$text-muted;
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__link {
+    @include m.button-base;
+    background-color: v.$primary;
+    color: v.$white;
+    text-decoration: none;
+
+    &:hover {
+      background-color: v.$primary-dark;
+    }
+  }
+} 

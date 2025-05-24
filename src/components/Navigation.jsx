@@ -25,8 +25,8 @@ const Navigation = () => {
           <>
             <li className="nav__item">
               <Link
-                to="/programs"
-                className={`nav__link ${isActive('/programs') ? 'nav__link--active' : ''}`}
+                to="/my-programs"
+                className={`nav__link ${isActive('/my-programs') ? 'nav__link--active' : ''}`}
               >
                 Programs
               </Link>

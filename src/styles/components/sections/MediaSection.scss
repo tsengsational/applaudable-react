@@ -1,0 +1,58 @@
+@use '../../base/variables' as v;
+@use '../../base/mixins' as m;
+
+.media-section {
+  @include m.card;
+  margin-bottom: v.$spacing-6;
+
+  &__form-group {
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__label {
+    display: block;
+    font-size: v.$font-size-sm;
+    font-weight: 500;
+    color: v.$text-primary;
+    margin-bottom: v.$spacing-2;
+  }
+
+  &__input {
+    width: 100%;
+    padding: v.$spacing-2;
+    border: 1px solid v.$border;
+    border-radius: v.$border-radius-md;
+    background-color: v.$white;
+    font-size: v.$font-size-base;
+    color: v.$text-primary;
+
+    &:focus {
+      outline: none;
+      border-color: v.$primary;
+      box-shadow: 0 0 0 2px rgba(v.$primary, 0.1);
+    }
+  }
+
+  &__select {
+    width: 100%;
+    padding: v.$spacing-2;
+    border: 1px solid v.$border;
+    border-radius: v.$border-radius-md;
+    background-color: v.$white;
+    font-size: v.$font-size-base;
+    color: v.$text-primary;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: v.$primary;
+      box-shadow: 0 0 0 2px rgba(v.$primary, 0.1);
+    }
+  }
+
+  &__preview {
+    margin-top: v.$spacing-4;
+    border-radius: v.$border-radius-md;
+    overflow: hidden;
+  }
+} 

@@ -1,0 +1,72 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.image-uploader {
+  margin-bottom: v.$spacing-4;
+
+  &__dropzone {
+    border: 2px dashed v.$border;
+    border-radius: v.$border-radius-md;
+    padding: v.$spacing-6;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: v.$primary;
+      background-color: rgba(v.$primary, 0.05);
+    }
+  }
+
+  &__input {
+    display: none;
+  }
+
+  &__preview {
+    margin-top: v.$spacing-4;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: v.$spacing-4;
+  }
+
+  &__preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: v.$border-radius-md;
+    overflow: hidden;
+  }
+
+  &__preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__remove-button {
+    position: absolute;
+    top: v.$spacing-2;
+    right: v.$spacing-2;
+    background-color: v.$white;
+    border: none;
+    border-radius: v.$border-radius-full;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: v.$text-muted;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: v.$error;
+      color: v.$white;
+    }
+  }
+
+  &__error {
+    color: v.$error;
+    margin-top: v.$spacing-2;
+    font-size: v.$font-size-sm;
+  }
+} 

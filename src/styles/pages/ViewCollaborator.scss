@@ -1,0 +1,127 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.view-collaborator {
+  padding: v.$spacing-8 0;
+
+  &__header {
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__title {
+    font-size: v.$font-size-3xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__subtitle {
+    font-size: v.$font-size-xl;
+    color: v.$text-muted;
+  }
+
+  &__content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  &__image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: v.$border-radius-md;
+    margin-bottom: v.$spacing-6;
+  }
+
+  &__info {
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__role {
+    font-size: v.$font-size-xl;
+    color: v.$text-secondary;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__bio {
+    color: v.$text-primary;
+    line-height: 1.6;
+    margin-bottom: v.$spacing-6;
+
+    p {
+      margin-bottom: v.$spacing-4;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__meta-item {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
+    color: v.$text-secondary;
+  }
+
+  &__programs {
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__programs-title {
+    font-size: v.$font-size-2xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__programs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: v.$spacing-6;
+  }
+
+  &__program-card {
+    @include m.card;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
+
+  &__program-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-top-left-radius: v.$border-radius-md;
+    border-top-right-radius: v.$border-radius-md;
+  }
+
+  &__program-content {
+    padding: v.$spacing-4;
+  }
+
+  &__program-title {
+    font-size: v.$font-size-xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-2;
+    color: v.$text-primary;
+  }
+
+  &__program-role {
+    color: v.$text-secondary;
+  }
+
+  &__loading,
+  &__error {
+    text-align: center;
+    padding: v.$spacing-8;
+    color: v.$text-muted;
+  }
+
+  &__error {
+    color: v.$error;
+  }
+} 

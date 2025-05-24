@@ -16,7 +16,7 @@ const Header = () => {
           {currentUser ? (
             <>
               <Link to="/editor" className="header__link">Create Program</Link>
-              <Link to="/programs" className="header__link">My Programs</Link>
+              <Link to="/my-programs" className="header__link">My Programs</Link>
               <button 
                 onClick={logout} 
                 className="header__button"

@@ -25,38 +25,38 @@ export const VideoMedia = ({ section, collaborators }) => {
   };
 
   return (
-    <div className="section">
-      <h2 className="section-title">{section.title}</h2>
-      {section.subtitle && <h3 className="section-subtitle">{section.subtitle}</h3>}
+    <div className="video-media">
+      <h2 className="video-media__title">{section.title}</h2>
+      {section.subtitle && <h3 className="video-media__subtitle">{section.subtitle}</h3>}
       
-      <div className="section-content">
+      <div className="video-media__content">
         {section.mediaSource && (
-          <div className="video-container">
+          <div className="video-media__container">
             <iframe
               src={getEmbedUrl(section.mediaSource)}
               title={section.title}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="video-iframe"
+              className="video-media__iframe"
             />
           </div>
         )}
       </div>
 
       {section.bylines && section.bylines.length > 0 && (
-        <div className="bylines">
+        <div className="video-media__bylines">
           {section.bylines.map((byline, index) => {
             const collaborator = collaborators[byline.id];
             return (
-              <div key={index} className="byline">
-                <span className="role">{byline.role}: </span>
-                <span className="name">
+              <div key={index} className="video-media__byline">
+                <span className="video-media__role">{byline.role}: </span>
+                <span className="video-media__name">
                   {collaborator ? (
                     collaborator.creditedName || 
                     `${collaborator.firstName} ${collaborator.lastName}`
                   ) : (
-                    <span className="text-red-500">Collaborator not found</span>
+                    <span className="video-media__name--error">Collaborator not found</span>
                   )}
                 </span>
               </div>

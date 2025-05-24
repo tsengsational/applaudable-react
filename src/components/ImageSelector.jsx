@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import React, { useState, useEffect } from 'react';
+import { getImages } from '../services/imageService';
+import { useAuth } from '../contexts/AuthContext';
 import Modal from './Modal';
 
 /**
@@ -12,6 +12,7 @@ import Modal from './Modal';
  * @param {boolean} props.isOpen - Whether the modal is open
  */
 export const ImageSelector = ({ userId, onSelect, onClose, isOpen }) => {
+  const { currentUser } = useAuth();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,16 +24,8 @@ export const ImageSelector = ({ userId, onSelect, onClose, isOpen }) => {
       
       try {
         setLoading(true);
-        const userImagesRef = collection(db, 'users', userId, 'images');
-        const q = query(userImagesRef);
-        const querySnapshot = await getDocs(q);
-        
-        const imageList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        
-        setImages(imageList);
+        const userImages = await getImages(userId);
+        setImages(userImages);
       } catch (err) {
         console.error('Error fetching images:', err);
         setError('Failed to load images');
@@ -52,6 +45,18 @@ export const ImageSelector = ({ userId, onSelect, onClose, isOpen }) => {
     return filename.toLowerCase().includes(searchLower);
   });
 
+  if (loading) {
+    return <div className="image-selector__loading">Loading images...</div>;
+  }
+
+  if (error) {
+    return <div className="image-selector__error">{error}</div>;
+  }
+
+  if (images.length === 0) {
+    return <div className="image-selector__empty">No images found</div>;
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -70,34 +75,22 @@ export const ImageSelector = ({ userId, onSelect, onClose, isOpen }) => {
           />
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="text-center py-4">
-            Loading images...
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="text-red-600 py-2">
-            {error}
-          </div>
-        )}
-
         {/* Image Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="image-selector__grid">
           {filteredImages.map((image) => (
             <div
               key={image.id}
-              className="relative aspect-square cursor-pointer group"
-              onClick={() => onSelect(image.urlsByWidth)}
+              className={`image-selector__item ${image.url === image.url ? 'image-selector__item--selected' : ''}`}
+              onClick={() => onSelect(image.url)}
             >
               <img
-                src={image.urlsByWidth['640']}
-                alt=""
-                className="w-full h-full object-cover rounded-lg"
+                src={image.url}
+                alt={image.name}
+                className="image-selector__image"
               />
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded-lg" />
+              <div className="image-selector__overlay">
+                <span className="image-selector__name">{image.name}</span>
+              </div>
             </div>
           ))}
         </div>
@@ -111,4 +104,6 @@ export const ImageSelector = ({ userId, onSelect, onClose, isOpen }) => {
       </div>
     </Modal>
   );
-}; 
+};
+
+export default ImageSelector; 

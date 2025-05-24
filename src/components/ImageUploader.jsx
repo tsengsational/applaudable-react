@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useImageUploader } from '../hooks/useImageUploader';
+import React, { useState, useRef } from 'react';
+import { uploadImage } from '../services/imageService';
+import { useAuth } from '../contexts/AuthContext';
 import { ImageSelector } from './ImageSelector';
 
 /**
@@ -12,26 +13,31 @@ import { ImageSelector } from './ImageSelector';
  * @param {string} props.className - Additional CSS classes
  */
 export const ImageUploader = ({ userId, onUpload, onDelete, existingImageUrl, className = '' }) => {
+  const { currentUser } = useAuth();
   const [previewUrl, setPreviewUrl] = useState(existingImageUrl);
   const [showImageSelector, setShowImageSelector] = useState(false);
-  const { handleFileUpload, isUploading, error } = useImageUploader(userId);
-
-  useEffect(() => {
-    setPreviewUrl(existingImageUrl);
-  }, [existingImageUrl]);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    setUploading(true);
+    setError(null);
+
     try {
-      const urlsByWidth = await handleFileUpload(file);
+      const urlsByWidth = await uploadImage(currentUser.uid, file);
       if (urlsByWidth) {
         setPreviewUrl(urlsByWidth['1280']);
         onUpload(urlsByWidth);
       }
     } catch (err) {
-      console.error('Error uploading file:', err);
+      console.error('Error uploading image:', err);
+      setError('Failed to upload image');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -44,61 +50,52 @@ export const ImageUploader = ({ userId, onUpload, onDelete, existingImageUrl, cl
   const handleDelete = () => {
     setPreviewUrl('');
     onDelete();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`image-uploader ${className}`}>
       {/* Preview */}
       {previewUrl && (
-        <div className="relative aspect-video">
+        <div className="image-uploader__preview">
           <img
             src={previewUrl}
             alt="Preview"
-            className="w-full h-full object-cover rounded-lg"
+            className="image-uploader__image"
           />
           <button
             type="button"
             onClick={handleDelete}
-            className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full hover:bg-red-700"
+            className="image-uploader__delete"
           >
-            Delete
+            Remove Image
           </button>
         </div>
       )}
 
       {/* Upload Controls */}
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-            id="image-upload"
-            disabled={isUploading}
-          />
-          <label
-            htmlFor="image-upload"
-            className="block w-full text-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
-          >
-            {isUploading ? 'Uploading...' : 'Upload New Image'}
-          </label>
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowImageSelector(true)}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-        >
-          Select Existing Image
-        </button>
+      <div className="image-uploader__dropzone">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="image-uploader__input"
+          disabled={uploading}
+        />
+        {uploading && (
+          <div className="image-uploader__loading">
+            Uploading...
+          </div>
+        )}
+        {error && (
+          <div className="image-uploader__error">
+            {error}
+          </div>
+        )}
       </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="text-red-600 text-sm">
-          {error}
-        </div>
-      )}
 
       {/* Image Selector Modal */}
       <ImageSelector

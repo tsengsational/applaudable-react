@@ -11,30 +11,30 @@ const MEDIA_TYPES = {
 
 export const MediaSection = ({ section, onUpdate, userId }) => {
   return (
-    <div className="section">
-      <div className="form-group">
-        <label className="form-label">Section Title</label>
+    <div className="media-section">
+      <div className="media-section__form-group">
+        <label className="media-section__label">Section Title</label>
         <input
           type="text"
           value={section.title}
           onChange={(e) => onUpdate(section.id, { title: e.target.value })}
-          className="form-input"
+          className="media-section__input"
           required
         />
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Section Subtitle</label>
+      <div className="media-section__form-group">
+        <label className="media-section__label">Section Subtitle</label>
         <input
           type="text"
           value={section.subtitle}
           onChange={(e) => onUpdate(section.id, { subtitle: e.target.value })}
-          className="form-input"
+          className="media-section__input"
         />
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Media Type</label>
+      <div className="media-section__form-group">
+        <label className="media-section__label">Media Type</label>
         <select
           value={section.mediaType}
           onChange={(e) => onUpdate(section.id, { 
@@ -42,7 +42,7 @@ export const MediaSection = ({ section, onUpdate, userId }) => {
             mediaSource: '',
             galleryImages: []
           })}
-          className="form-input"
+          className="media-section__select"
           required
         >
           {Object.values(MEDIA_TYPES).map(type => (

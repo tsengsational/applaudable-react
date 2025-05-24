@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { ImageUploader } from './ImageUploader';
 import { deleteImage } from '../services/imageService';
 
-export default function CreateCollaboratorForm({ onSuccess, onCancel, initialData }) {
+const CreateCollaboratorForm = ({ onSuccess, onCancel, initialData }) => {
   const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -158,168 +158,69 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel, initialDat
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="card mb-4" style={{ backgroundColor: '#fee2e2', color: '#dc2626' }}>
-          {error}
-        </div>
-      )}
-
-      <div className="form-group">
-        <label className="form-label">Profile Image</label>
-        <ImageUploader 
-          userId={currentUser?.uid}
-          onUpload={handleImageUpload}
-          onDelete={handleImageDelete}
-          existingImageUrl={formData.primaryImageUrl}
-          className="mb-4"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="form-group">
-          <label htmlFor="firstName" className="form-label">First Name</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="form-input"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="lastName" className="form-label">Last Name</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="form-input"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="creditedName" className="form-label">Credited Name (optional)</label>
+    <form className="collaborator-form" onSubmit={handleSubmit}>
+      <div className="collaborator-form__group">
+        <label className="collaborator-form__label">First Name</label>
         <input
           type="text"
-          id="creditedName"
-          name="creditedName"
-          value={formData.creditedName}
+          name="firstName"
+          value={formData.firstName}
           onChange={handleChange}
-          className="form-input"
-          placeholder="e.g., J.R.R. Tolkien"
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="bio" className="form-label">Bio</label>
-        <textarea
-          id="bio"
-          name="bio"
-          value={formData.bio}
-          onChange={handleChange}
-          className="form-input"
-          rows="4"
+          className="collaborator-form__input"
           required
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="form-input"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="phone" className="form-label">Phone</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            className="form-input"
-          />
-        </div>
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="website" className="form-label">Website</label>
+      <div className="collaborator-form__group">
+        <label className="collaborator-form__label">Last Name</label>
         <input
-          type="url"
-          id="website"
-          name="website"
-          value={formData.website}
+          type="text"
+          name="lastName"
+          value={formData.lastName}
           onChange={handleChange}
-          className="form-input"
+          className="collaborator-form__input"
+          required
         />
       </div>
 
-      <div className="space-y-4">
-        <h4 className="font-bold">Social Links</h4>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="form-group">
-            <label htmlFor="social.instagram" className="form-label">Instagram</label>
-            <input
-              type="url"
-              id="social.instagram"
-              name="social.instagram"
-              value={formData.socialLinks.instagram}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="social.twitter" className="form-label">Twitter</label>
-            <input
-              type="url"
-              id="social.twitter"
-              name="social.twitter"
-              value={formData.socialLinks.twitter}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="social.linkedin" className="form-label">LinkedIn</label>
-            <input
-              type="url"
-              id="social.linkedin"
-              name="social.linkedin"
-              value={formData.socialLinks.linkedin}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="social.facebook" className="form-label">Facebook</label>
-            <input
-              type="url"
-              id="social.facebook"
-              name="social.facebook"
-              value={formData.socialLinks.facebook}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-        </div>
+      <div className="collaborator-form__group">
+        <label className="collaborator-form__label">Credited Name (optional)</label>
+        <input
+          type="text"
+          name="creditedName"
+          value={formData.creditedName}
+          onChange={handleChange}
+          className="collaborator-form__input"
+          placeholder="Name as it should appear in credits"
+        />
       </div>
+
+      <div className="collaborator-form__group">
+        <label className="collaborator-form__label">Bio</label>
+        <textarea
+          name="bio"
+          value={formData.bio}
+          onChange={handleChange}
+          className="collaborator-form__textarea"
+          rows="4"
+        />
+      </div>
+
+      <div className="collaborator-form__group">
+        <label className="collaborator-form__label">Profile Image</label>
+        <ImageUploader
+          userId={currentUser.uid}
+          onUpload={handleImageUpload}
+          onDelete={handleImageDelete}
+          existingImageUrl={formData.primaryImageUrl}
+        />
+      </div>
+
+      {error && (
+        <div className="collaborator-form__error">
+          {error}
+        </div>
+      )}
 
       <div className="flex justify-end space-x-2">
         <button
@@ -331,12 +232,14 @@ export default function CreateCollaboratorForm({ onSuccess, onCancel, initialDat
         </button>
         <button
           type="submit"
-          disabled={loading}
           className="btn btn-primary"
+          disabled={loading}
         >
           {loading ? 'Saving...' : initialData ? 'Update' : 'Create'} Collaborator
         </button>
       </div>
     </form>
   );
-} 
+};
+
+export default CreateCollaboratorForm; 

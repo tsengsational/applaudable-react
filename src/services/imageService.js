@@ -6,9 +6,13 @@ import {
   getDoc, 
   updateDoc, 
   arrayUnion, 
-  arrayRemove 
+  arrayRemove,
+  query,
+  getDocs,
+  deleteDoc
 } from 'firebase/firestore';
 import { db } from '../config/firebase.js';
+import { storage } from '../config/firebase';
 
 /**
  * Stores image metadata in Firestore
@@ -53,23 +57,17 @@ export const updateImageUsage = async (userId, imageId) => {
  * @returns {Promise<void>}
  */
 export const deleteImage = async (userId, imageId) => {
-  const storage = getStorage();
-  const userImagesRef = doc(db, 'users', userId, 'images', imageId);
-  const imageDoc = await getDoc(userImagesRef);
-  
-  if (imageDoc.exists()) {
-    const { urlsByWidth } = imageDoc.data();
-    
-    // Delete all versions from Storage
-    const deletePromises = Object.values(urlsByWidth).map(url => {
-      const storageRef = ref(storage, url);
-      return deleteObject(storageRef);
-    });
-    
-    await Promise.all(deletePromises);
-    
-    // Delete metadata from Firestore
-    await deleteObject(userImagesRef);
+  try {
+    // Delete from Storage
+    const imageRef = ref(storage, `users/${userId}/images/${imageId}_original`);
+    await deleteObject(imageRef);
+
+    // Delete from Firestore
+    const imageDocRef = doc(db, 'users', userId, 'images', imageId);
+    await deleteDoc(imageDocRef);
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    throw error;
   }
 };
 
@@ -137,5 +135,66 @@ export const checkImageExists = async (userId, imageHash) => {
   } catch (error) {
     console.error('Error checking image existence:', error);
     return { exists: false };
+  }
+};
+
+/**
+ * Upload an image to Firebase Storage and create a record in Firestore
+ * @param {string} userId - The ID of the user uploading the image
+ * @param {File} file - The image file to upload
+ * @returns {Promise<Object>} Object containing URLs for different image sizes
+ */
+export const uploadImage = async (userId, file) => {
+  try {
+    // Generate a unique ID for the image
+    const imageId = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    
+    // Upload the original image
+    const originalRef = ref(storage, `users/${userId}/images/${imageId}_original`);
+    await uploadBytes(originalRef, file);
+    const originalUrl = await getDownloadURL(originalRef);
+
+    // Create a record in Firestore
+    const imageData = {
+      id: imageId,
+      name: file.name,
+      originalUrl,
+      userId,
+      createdAt: new Date().toISOString()
+    };
+
+    // Add to Firestore
+    const imageRef = doc(collection(db, 'users', userId, 'images'));
+    await setDoc(imageRef, imageData);
+
+    return {
+      id: imageId,
+      url: originalUrl,
+      name: file.name
+    };
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get all images for a user
+ * @param {string} userId - The ID of the user
+ * @returns {Promise<Array>} Array of image objects
+ */
+export const getImages = async (userId) => {
+  try {
+    const imagesRef = collection(db, 'users', userId, 'images');
+    const q = query(imagesRef);
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting images:', error);
+    throw error;
   }
 }; 

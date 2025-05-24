@@ -90,11 +90,11 @@ export const ViewProgram = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading program...</p>
+      <div className="view-program view-program--loading">
+        <div className="view-program__container">
+          <div className="view-program__loading">
+            <div className="view-program__spinner"></div>
+            <p className="view-program__loading-text">Loading program...</p>
           </div>
         </div>
       </div>
@@ -103,14 +103,14 @@ export const ViewProgram = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Error</h2>
-            <p className="text-gray-600">{error}</p>
+      <div className="view-program view-program--error">
+        <div className="view-program__container">
+          <div className="view-program__error">
+            <h2 className="view-program__error-title">Error</h2>
+            <p className="view-program__error-message">{error}</p>
             <button
               onClick={() => navigate('/')}
-              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="view-program__error-button"
             >
               Return Home
             </button>
@@ -125,27 +125,27 @@ export const ViewProgram = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:px-6">
-            <h1 className="text-3xl font-bold text-gray-900">{program.title}</h1>
+    <div className="view-program">
+      <div className="view-program__container">
+        <div className="view-program__content">
+          <div className="view-program__header">
+            <h1 className="view-program__title">{program.title}</h1>
             {program.subtitle && (
-              <p className="mt-1 text-xl text-gray-500">{program.subtitle}</p>
+              <p className="view-program__subtitle">{program.subtitle}</p>
             )}
           </div>
 
           {program.primaryImageUrl && (
-            <div className="px-4 py-5 sm:px-6">
+            <div className="view-program__primary-image">
               <img
                 src={program.primaryImageUrl}
                 alt={program.title}
-                className="w-full h-64 object-cover rounded-lg"
+                className="view-program__image"
               />
             </div>
           )}
 
-          <div className="border-t border-gray-200">
+          <div className="view-program__sections">
             {program.sections.map(section => renderSection(section))}
           </div>
         </div>

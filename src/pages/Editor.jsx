@@ -12,6 +12,8 @@ import '../styles/components/QuillEditor.scss';
 import { deleteImage } from '../services/imageService';
 import { TextSection } from '../components/sections/TextSection';
 import { MediaSection } from '../components/sections/MediaSection';
+import AddBylineForm from '../components/AddBylineForm';
+import '../styles/components/AddBylineForm.scss';
 
 const SECTION_TYPES = {
   TEXT: 'text',
@@ -52,6 +54,8 @@ export default function Editor() {
   const [selectedSection, setSelectedSection] = useState(null);
   const [showCollaboratorMenu, setShowCollaboratorMenu] = useState(false);
   const [showCreateCollaboratorModal, setShowCreateCollaboratorModal] = useState(false);
+  const [selectedCollaborator, setSelectedCollaborator] = useState(null);
+  const [showAddBylineModal, setShowAddBylineModal] = useState(false);
 
   const ITEMS_PER_PAGE = 10;
 
@@ -205,12 +209,31 @@ export default function Editor() {
   };
 
   const addByline = (sectionId, collaboratorId, role) => {
-    updateSection(sectionId, {
-      bylines: [...program.sections.find(s => s.id === sectionId).bylines, { 
-        id: collaboratorId,
-        role 
-      }]
-    });
+    const section = program.sections.find(s => s.id === sectionId);
+    const existingByline = section.bylines.find(b => b.role === role);
+
+    if (existingByline) {
+      // If a byline with this role exists, add the new collaborator to its collaborators array
+      const updatedBylines = section.bylines.map(byline => {
+        if (byline.role === role) {
+          return {
+            ...byline,
+            collaborators: [...(byline.collaborators || [byline.id]), collaboratorId]
+          };
+        }
+        return byline;
+      });
+      updateSection(sectionId, { bylines: updatedBylines });
+    } else {
+      // If no byline exists for this role, create a new one
+      updateSection(sectionId, {
+        bylines: [...section.bylines, { 
+          id: collaboratorId,
+          role,
+          collaborators: [collaboratorId]
+        }]
+      });
+    }
   };
 
   const removeByline = (sectionId, bylineIndex) => {
@@ -218,6 +241,31 @@ export default function Editor() {
     const newBylines = [...section.bylines];
     newBylines.splice(bylineIndex, 1);
     updateSection(sectionId, { bylines: newBylines });
+  };
+
+  const removeCollaboratorFromByline = (sectionId, bylineIndex, collaboratorId) => {
+    const section = program.sections.find(s => s.id === sectionId);
+    const byline = section.bylines[bylineIndex];
+    
+    if (byline.collaborators && byline.collaborators.length > 1) {
+      // If there are multiple collaborators, remove just this one
+      const updatedBylines = section.bylines.map((b, index) => {
+        if (index === bylineIndex) {
+          const updatedCollaborators = b.collaborators.filter(id => id !== collaboratorId);
+          return {
+            ...b,
+            collaborators: updatedCollaborators,
+            // Update the main id if we removed it
+            id: b.id === collaboratorId ? updatedCollaborators[0] : b.id
+          };
+        }
+        return b;
+      });
+      updateSection(sectionId, { bylines: updatedBylines });
+    } else {
+      // If this is the last collaborator, remove the entire byline
+      removeByline(sectionId, bylineIndex);
+    }
   };
 
   const filteredCollaborators = collaborators.filter(collaborator => {
@@ -316,6 +364,26 @@ export default function Editor() {
         );
       default:
         return null;
+    }
+  };
+
+  const getExistingRoles = (sectionId) => {
+    const section = program.sections.find(s => s.id === sectionId);
+    if (!section || !section.bylines) return [];
+    return section.bylines.map(byline => byline.role);
+  };
+
+  const handleCollaboratorSelect = (collaborator) => {
+    setSelectedCollaborator(collaborator);
+    setShowAddBylineModal(true);
+    setShowCollaboratorMenu(false);
+  };
+
+  const handleAddByline = (role) => {
+    if (selectedCollaborator && selectedSection) {
+      addByline(selectedSection, selectedCollaborator.id, role);
+      setShowAddBylineModal(false);
+      setSelectedCollaborator(null);
     }
   };
 
@@ -508,23 +576,39 @@ export default function Editor() {
                       </div>
 
                       {section.bylines.map((byline, bylineIndex) => {
-                        const collaborator = collaborators.find(c => c.id === byline.id);
+                        const collaboratorIds = byline.collaborators || [byline.id];
                         return (
-                          <div key={bylineIndex} className="flex-group">
-                            <div>
+                          <div key={bylineIndex} className="byline-group">
+                            <div className="byline-header">
                               <span className="bold">{byline.role}: </span>
-                              <span>
-                                {collaborator?.creditedName || 
-                                  `${collaborator?.firstName} ${collaborator?.lastName}`}
-                              </span>
+                              <button
+                                type="button"
+                                onClick={() => removeByline(section.id, bylineIndex)}
+                                className="text-button"
+                              >
+                                Remove Role
+                              </button>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => removeByline(section.id, bylineIndex)}
-                              className="text-button"
-                            >
-                              Remove
-                            </button>
+                            <ul className="collaborators-list">
+                              {collaboratorIds.map((collabId, collabIndex) => {
+                                const collaborator = collaborators.find(c => c.id === collabId);
+                                return (
+                                  <li key={collabIndex} className="collaborator-item">
+                                    <span>
+                                      {collaborator?.creditedName || 
+                                        `${collaborator?.firstName} ${collaborator?.lastName}`}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeCollaboratorFromByline(section.id, bylineIndex, collabId)}
+                                      className="text-button"
+                                    >
+                                      Remove
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                            </ul>
                           </div>
                         );
                       })}
@@ -567,13 +651,7 @@ export default function Editor() {
                 <div
                   key={collaborator.id}
                   className="flex-group"
-                  onClick={() => {
-                    const role = prompt('Enter role for this collaborator:');
-                    if (role) {
-                      addByline(selectedSection, collaborator.id, role);
-                      setShowCollaboratorMenu(false);
-                    }
-                  }}
+                  onClick={() => handleCollaboratorSelect(collaborator)}
                 >
                   <div>
                     <div className="font-medium">
@@ -632,6 +710,28 @@ export default function Editor() {
             onCancel={() => setShowCreateCollaboratorModal(false)}
           />
         </Modal>
+
+        {/* Add Byline Modal */}
+        {showAddBylineModal && selectedCollaborator && (
+          <Modal
+            isOpen={showAddBylineModal}
+            onClose={() => {
+              setShowAddBylineModal(false);
+              setSelectedCollaborator(null);
+            }}
+            title="Add Byline"
+          >
+            <AddBylineForm
+              onAdd={handleAddByline}
+              onCancel={() => {
+                setShowAddBylineModal(false);
+                setSelectedCollaborator(null);
+              }}
+              existingRoles={getExistingRoles(selectedSection)}
+              collaborator={selectedCollaborator}
+            />
+          </Modal>
+        )}
       </div>
     </div>
   );

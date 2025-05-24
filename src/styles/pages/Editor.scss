@@ -200,4 +200,39 @@
 
 .mt-group {
   margin-top: v.$spacing-4;
+}
+
+.byline-group {
+  margin-bottom: v.$spacing-4;
+  padding: v.$spacing-3;
+  border: 1px solid v.$border;
+  border-radius: v.$border-radius-md;
+  background-color: v.$background;
+
+  .byline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: v.$spacing-2;
+  }
+
+  .collaborators-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .collaborator-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: v.$spacing-2;
+    border-radius: v.$border-radius-sm;
+    background-color: v.$white;
+    margin-bottom: v.$spacing-1;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 } 

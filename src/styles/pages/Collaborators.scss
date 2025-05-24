@@ -2,25 +2,69 @@
 @use '../base/mixins' as m;
 
 .collaborators {
+  min-height: 100vh;
   padding: v.$spacing-8 0;
 
-  &__header {
-    @include m.flex-between;
-    margin-bottom: v.$spacing-8;
+  &--loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__loading {
+    font-size: v.$font-size-lg;
+    color: v.$text-secondary;
+  }
+
+  &__container {
+    @include m.container;
   }
 
   &__title {
     font-size: v.$font-size-3xl;
     font-weight: bold;
+    margin-bottom: v.$spacing-8;
+  }
+
+  &__error {
+    background-color: v.$error-light;
+    color: v.$error;
+    padding: v.$spacing-4;
+    border-radius: v.$border-radius;
     margin-bottom: v.$spacing-4;
   }
 
-  &__subtitle {
-    font-size: v.$font-size-xl;
-    color: v.$text-muted;
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$spacing-8;
+
+    @include m.media-up(lg) {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
-  &__create {
+  &__form-card,
+  &__list-card {
+    background-color: v.$background;
+    border-radius: v.$border-radius;
+    padding: v.$spacing-6;
+    box-shadow: v.$shadow-sm;
+  }
+
+  &__form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: v.$spacing-4;
+  }
+
+  &__form-title {
+    font-size: v.$font-size-xl;
+    font-weight: bold;
+  }
+
+  &__add-button {
     @include m.button-base;
     background-color: v.$primary;
     color: v.$white;
@@ -30,68 +74,87 @@
     }
   }
 
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: v.$spacing-6;
+  &__list-title {
+    font-size: v.$font-size-xl;
+    font-weight: bold;
+    margin-bottom: v.$spacing-4;
   }
 
-  &__card {
-    @include m.card;
-    transition: transform 0.2s;
-
-    &:hover {
-      transform: translateY(-4px);
-    }
+  &__empty-message {
+    color: v.$text-secondary;
   }
 
-  &__image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-top-left-radius: v.$border-radius-md;
-    border-top-right-radius: v.$border-radius-md;
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-4;
   }
 
-  &__content {
+  &__item {
+    border: 1px solid v.$border;
+    border-radius: v.$border-radius;
     padding: v.$spacing-4;
   }
 
-  &__name {
-    font-size: v.$font-size-xl;
-    font-weight: bold;
-    margin-bottom: v.$spacing-2;
-    color: v.$text-primary;
-  }
-
-  &__role {
-    color: v.$text-secondary;
-    margin-bottom: v.$spacing-4;
-  }
-
-  &__bio {
-    color: v.$text-muted;
-    font-size: v.$font-size-sm;
-    margin-bottom: v.$spacing-4;
-  }
-
-  &__meta {
+  &__item-content {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    color: v.$text-muted;
+    align-items: flex-start;
+  }
+
+  &__item-info {
+    display: flex;
+    align-items: flex-start;
+    gap: v.$spacing-4;
+  }
+
+  &__item-image {
+    flex-shrink: 0;
+  }
+
+  &__item-thumbnail {
+    width: 4rem;
+    height: 4rem;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  &__item-details {
+    flex-grow: 1;
+  }
+
+  &__item-name {
+    font-weight: bold;
+    margin-bottom: v.$spacing-1;
+  }
+
+  &__item-bio {
     font-size: v.$font-size-sm;
+    color: v.$text-secondary;
   }
 
-  &__empty {
-    text-align: center;
-    padding: v.$spacing-8;
-    color: v.$text-muted;
+  &__item-actions {
+    display: flex;
+    gap: v.$spacing-2;
   }
 
-  &__error {
-    text-align: center;
-    padding: v.$spacing-8;
+  &__edit-button {
+    @include m.button-base;
+    background-color: v.$primary-light;
+    color: v.$text-primary;
+
+    &:hover {
+      background-color: darken(v.$primary-light, 5%);
+    }
+  }
+
+  &__delete-button {
+    @include m.button-base;
+    background-color: v.$error-light;
     color: v.$error;
+
+    &:hover {
+      background-color: darken(v.$error-light, 5%);
+    }
   }
 } 

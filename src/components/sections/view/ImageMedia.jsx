@@ -25,14 +25,32 @@ export const ImageMedia = ({ section, collaborators }) => {
             return (
               <div key={index} className="image-media__byline">
                 <span className="image-media__role">{byline.role}: </span>
-                <span className="image-media__name">
-                  {collaborator ? (
-                    collaborator.creditedName || 
-                    `${collaborator.firstName} ${collaborator.lastName}`
-                  ) : (
-                    <span className="image-media__name--error">Collaborator not found</span>
-                  )}
-                </span>
+                {Array.isArray(byline.collaborators) && byline.collaborators.length > 1 ? (
+                  <ul className="image-media__collaborators-list">
+                    {byline.collaborators.map((collabId, collabIndex) => {
+                      const collab = collaborators[collabId];
+                      return (
+                        <li key={collabIndex} className="image-media__collaborator">
+                          {collab ? (
+                            collab.creditedName || 
+                            `${collab.firstName} ${collab.lastName}`
+                          ) : (
+                            <span className="image-media__name--error">Collaborator not found</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <span className="image-media__name">
+                    {collaborator ? (
+                      collaborator.creditedName || 
+                      `${collaborator.firstName} ${collaborator.lastName}`
+                    ) : (
+                      <span className="image-media__name--error">Collaborator not found</span>
+                    )}
+                  </span>
+                )}
               </div>
             );
           })}

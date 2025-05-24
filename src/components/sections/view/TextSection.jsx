@@ -22,14 +22,32 @@ export const TextSection = ({ section, collaborators }) => {
             return (
               <div key={index} className="text-section__byline">
                 <span className="text-section__role">{byline.role}: </span>
-                <span className="text-section__name">
-                  {collaborator ? (
-                    collaborator.creditedName || 
-                    `${collaborator.firstName} ${collaborator.lastName}`
-                  ) : (
-                    <span className="text-section__name--error">Collaborator not found</span>
-                  )}
-                </span>
+                {Array.isArray(byline.collaborators) && byline.collaborators.length > 1 ? (
+                  <ul className="text-section__collaborators-list">
+                    {byline.collaborators.map((collabId, collabIndex) => {
+                      const collab = collaborators[collabId];
+                      return (
+                        <li key={collabIndex} className="text-section__collaborator">
+                          {collab ? (
+                            collab.creditedName || 
+                            `${collab.firstName} ${collab.lastName}`
+                          ) : (
+                            <span className="text-section__name--error">Collaborator not found</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <span className="text-section__name">
+                    {collaborator ? (
+                      collaborator.creditedName || 
+                      `${collaborator.firstName} ${collaborator.lastName}`
+                    ) : (
+                      <span className="text-section__name--error">Collaborator not found</span>
+                    )}
+                  </span>
+                )}
               </div>
             );
           })}

@@ -4,17 +4,75 @@
 .image-uploader {
   margin-bottom: v.$spacing-4;
 
-  &__dropzone {
-    border: 2px dashed v.$border;
+  &__preview {
+    margin-bottom: v.$spacing-4;
+    position: relative;
+    border-radius: v.$border-radius;
+    overflow: hidden;
+  }
+
+  &__image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  &__delete {
+    position: absolute;
+    bottom: v.$spacing-2;
+    right: v.$spacing-2;
+    background-color: rgba(v.$error, 0.9);
+    color: v.$white;
+    border: none;
+    padding: v.$spacing-2 v.$spacing-4;
     border-radius: v.$border-radius-md;
-    padding: v.$spacing-6;
-    text-align: center;
     cursor: pointer;
     transition: all 0.2s;
 
     &:hover {
+      background-color: v.$error;
+    }
+  }
+
+  &__dropzone {
+    border: 2px dashed v.$border;
+    border-radius: v.$border-radius;
+    padding: v.$spacing-6;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: v.$white;
+
+    &:hover {
       border-color: v.$primary;
-      background-color: rgba(v.$primary, 0.05);
+      background-color: v.$background-hover;
+    }
+
+    &--dragging {
+      border-color: v.$primary;
+      background-color: v.$background-hover;
+    }
+  }
+
+  &__dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$spacing-4;
+  }
+
+  &__select-button {
+    background-color: v.$primary;
+    color: v.$white;
+    border: none;
+    padding: v.$spacing-2 v.$spacing-4;
+    border-radius: v.$border-radius-md;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: v.$primary-dark;
     }
   }
 
@@ -22,51 +80,13 @@
     display: none;
   }
 
-  &__preview {
-    margin-top: v.$spacing-4;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: v.$spacing-4;
-  }
-
-  &__preview-item {
-    position: relative;
-    aspect-ratio: 1;
-    border-radius: v.$border-radius-md;
-    overflow: hidden;
-  }
-
-  &__preview-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  &__remove-button {
-    position: absolute;
-    top: v.$spacing-2;
-    right: v.$spacing-2;
-    background-color: v.$white;
-    border: none;
-    border-radius: v.$border-radius-full;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+  &__loading {
     color: v.$text-muted;
-    transition: all 0.2s;
-
-    &:hover {
-      background-color: v.$error;
-      color: v.$white;
-    }
+    margin-top: v.$spacing-2;
   }
 
   &__error {
     color: v.$error;
     margin-top: v.$spacing-2;
-    font-size: v.$font-size-sm;
   }
 } 

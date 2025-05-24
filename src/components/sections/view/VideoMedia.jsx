@@ -51,14 +51,32 @@ export const VideoMedia = ({ section, collaborators }) => {
             return (
               <div key={index} className="video-media__byline">
                 <span className="video-media__role">{byline.role}: </span>
-                <span className="video-media__name">
-                  {collaborator ? (
-                    collaborator.creditedName || 
-                    `${collaborator.firstName} ${collaborator.lastName}`
-                  ) : (
-                    <span className="video-media__name--error">Collaborator not found</span>
-                  )}
-                </span>
+                {Array.isArray(byline.collaborators) && byline.collaborators.length > 1 ? (
+                  <ul className="video-media__collaborators-list">
+                    {byline.collaborators.map((collabId, collabIndex) => {
+                      const collab = collaborators[collabId];
+                      return (
+                        <li key={collabIndex} className="video-media__collaborator">
+                          {collab ? (
+                            collab.creditedName || 
+                            `${collab.firstName} ${collab.lastName}`
+                          ) : (
+                            <span className="video-media__name--error">Collaborator not found</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <span className="video-media__name">
+                    {collaborator ? (
+                      collaborator.creditedName || 
+                      `${collaborator.firstName} ${collaborator.lastName}`
+                    ) : (
+                      <span className="video-media__name--error">Collaborator not found</span>
+                    )}
+                  </span>
+                )}
               </div>
             );
           })}

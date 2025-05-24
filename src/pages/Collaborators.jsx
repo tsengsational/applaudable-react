@@ -31,7 +31,6 @@ export default function Collaborators() {
 
   const handleCreateSuccess = async (newCollaborator) => {
     try {
-      // Fetch the complete updated list of collaborators
       const updatedCollaborators = await getUserCollaborators(currentUser.uid);
       setCollaborators(updatedCollaborators);
       setShowCreateForm(false);
@@ -61,34 +60,34 @@ export default function Collaborators() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div>Loading...</div>
+      <div className="collaborators collaborators--loading">
+        <div className="collaborators__loading">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-12">
-      <div className="container">
-        <h1>Collaborators</h1>
+    <div className="collaborators">
+      <div className="collaborators__container">
+        <h1 className="collaborators__title">Collaborators</h1>
 
         {error && (
-          <div className="card mb-4" style={{ backgroundColor: '#fee2e2', color: '#dc2626' }}>
+          <div className="collaborators__error">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="collaborators__grid">
           {/* Collaborator Form */}
-          <div className="card">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
+          <div className="collaborators__form-card">
+            <div className="collaborators__form-header">
+              <h2 className="collaborators__form-title">
                 {editingCollaborator ? 'Edit Collaborator' : 'Add New Collaborator'}
               </h2>
               {!showCreateForm && (
                 <button
                   onClick={() => setShowCreateForm(true)}
-                  className="btn btn-primary"
+                  className="collaborators__add-button"
                 >
                   Add New Collaborator
                 </button>
@@ -108,32 +107,42 @@ export default function Collaborators() {
           </div>
 
           {/* Collaborators List */}
-          <div className="card">
-            <h2 className="text-xl font-bold mb-4">Your Collaborators</h2>
+          <div className="collaborators__list-card">
+            <h2 className="collaborators__list-title">Your Collaborators</h2>
             {collaborators.length === 0 ? (
-              <p>No collaborators yet. Add your first collaborator using the form.</p>
+              <p className="collaborators__empty-message">No collaborators yet. Add your first collaborator using the form.</p>
             ) : (
-              <div className="space-y-4">
+              <div className="collaborators__list">
                 {collaborators.map((collaborator) => (
-                  <div key={collaborator.id} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-bold">
-                          {collaborator.creditedName || `${collaborator.firstName} ${collaborator.lastName}`}
-                        </h3>
-                        <p className="text-sm text-gray-600">{collaborator.bio}</p>
+                  <div key={collaborator.id} className="collaborators__item">
+                    <div className="collaborators__item-content">
+                      <div className="collaborators__item-info">
+                        {collaborator.primaryImageUrl && (
+                          <div className="collaborators__item-image">
+                            <img
+                              src={collaborator.primaryImageUrl}
+                              alt={collaborator.creditedName || `${collaborator.firstName} ${collaborator.lastName}`}
+                              className="collaborators__item-thumbnail"
+                            />
+                          </div>
+                        )}
+                        <div className="collaborators__item-details">
+                          <h3 className="collaborators__item-name">
+                            {collaborator.creditedName || `${collaborator.firstName} ${collaborator.lastName}`}
+                          </h3>
+                          <p className="collaborators__item-bio">{collaborator.bio}</p>
+                        </div>
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="collaborators__item-actions">
                         <button
                           onClick={() => handleEdit(collaborator)}
-                          className="btn btn-secondary"
+                          className="collaborators__edit-button"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(collaborator.id)}
-                          className="btn btn-secondary"
-                          style={{ backgroundColor: '#fee2e2', color: '#dc2626' }}
+                          className="collaborators__delete-button"
                         >
                           Delete
                         </button>

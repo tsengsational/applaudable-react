@@ -2,26 +2,29 @@
 @use '../base/mixins' as m;
 
 .image-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: v.$spacing-4;
-  margin-bottom: v.$spacing-6;
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: v.$spacing-4;
+    margin-top: v.$spacing-4;
+  }
 
   &__item {
     position: relative;
-    width: calc(33.333% - v.$spacing-4);
     aspect-ratio: 1;
     border-radius: v.$border-radius-md;
     overflow: hidden;
     cursor: pointer;
     transition: all 0.2s;
+    border: 2px solid transparent;
 
     &:hover {
       transform: scale(1.02);
+      border-color: v.$primary;
     }
 
     &--selected {
-      border: 2px solid v.$primary;
+      border-color: v.$primary;
     }
   }
 

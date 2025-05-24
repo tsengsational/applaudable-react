@@ -347,4 +347,38 @@
   &__error {
     color: v.$error;
   }
+
+  &__collaborator-button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: v.$primary;
+    cursor: pointer;
+    font-size: inherit;
+    text-align: left;
+    transition: color 0.2s;
+
+    &:hover {
+      color: v.$primary-dark;
+      text-decoration: underline;
+    }
+  }
+
+  &__collaborator-item {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-2;
+  }
+
+  &__remove-collaborator {
+    @include m.button-base;
+    background-color: v.$error-light;
+    color: v.$error;
+    font-size: v.$font-size-sm;
+    padding: v.$spacing-1 v.$spacing-2;
+
+    &:hover {
+      background-color: darken(v.$error-light, 5%);
+    }
+  }
 } 

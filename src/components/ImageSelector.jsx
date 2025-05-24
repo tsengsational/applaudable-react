@@ -80,11 +80,11 @@ export const ImageSelector = ({ userId, onSelect, onClose, isOpen }) => {
           {filteredImages.map((image) => (
             <div
               key={image.id}
-              className={`image-selector__item ${image.url === image.url ? 'image-selector__item--selected' : ''}`}
-              onClick={() => onSelect(image.url)}
+              className="image-selector__item"
+              onClick={() => onSelect(image.urlsByWidth)}
             >
               <img
-                src={image.url}
+                src={image.urlsByWidth['640'] || Object.values(image.urlsByWidth)[0]}
                 alt={image.name}
                 className="image-selector__image"
               />

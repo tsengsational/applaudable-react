@@ -1,0 +1,47 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
+.add-byline-form {
+  .autocomplete-container {
+    position: relative;
+  }
+
+  .autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: v.$white;
+    border: 1px solid v.$border;
+    border-radius: v.$border-radius-md;
+    margin-top: 0.25rem;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: v.$z-index-dropdown;
+    box-shadow: v.$shadow;
+  }
+
+  .autocomplete-suggestion {
+    padding: v.$spacing-2 v.$spacing-4;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: v.$background;
+    }
+  }
+
+  .selected-collaborator {
+    padding: v.$spacing-3;
+    background-color: v.$background;
+    border-radius: v.$border-radius-md;
+    margin-top: v.$spacing-1;
+  }
+
+  .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: v.$spacing-4;
+    margin-top: v.$spacing-6;
+  }
+} 

@@ -36,7 +36,16 @@ export const ViewProgram = () => {
         programData.sections.forEach(section => {
           if (section.bylines) {
             section.bylines.forEach(byline => {
-              collaboratorIds.add(byline.id);
+              // Add the main collaborator ID
+              if (byline.id) {
+                collaboratorIds.add(byline.id);
+              }
+              // Add all collaborators from the collaborators array
+              if (Array.isArray(byline.collaborators)) {
+                byline.collaborators.forEach(collabId => {
+                  collaboratorIds.add(collabId);
+                });
+              }
             });
           }
         });
@@ -46,18 +55,18 @@ export const ViewProgram = () => {
           collaboratorPromises.push(getCollaborator(id));
         });
 
-        const collaboratorResults = await Promise.all(collaboratorPromises);
-        const collaboratorMap = {};
-        collaboratorResults.forEach(collaborator => {
+        const fetchedCollaborators = await Promise.all(collaboratorPromises);
+        const collaboratorsMap = {};
+        fetchedCollaborators.forEach(collaborator => {
           if (collaborator) {
-            collaboratorMap[collaborator.id] = collaborator;
+            collaboratorsMap[collaborator.id] = collaborator;
           }
         });
 
-        setCollaborators(collaboratorMap);
+        setCollaborators(collaboratorsMap);
         setLoading(false);
-      } catch (err) {
-        console.error('Error fetching program:', err);
+      } catch (error) {
+        console.error('Error fetching program:', error);
         setError('Failed to load program');
         setLoading(false);
       }

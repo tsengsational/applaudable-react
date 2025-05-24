@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { uploadImage } from '../services/imageService';
 import { useAuth } from '../contexts/AuthContext';
 import { ImageSelector } from './ImageSelector';
@@ -18,12 +18,23 @@ export const ImageUploader = ({ userId, onUpload, onDelete, existingImageUrl, cl
   const [showImageSelector, setShowImageSelector] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+  const dropzoneRef = useRef(null);
+
+  // Update previewUrl when existingImageUrl changes
+  useEffect(() => {
+    setPreviewUrl(existingImageUrl);
+  }, [existingImageUrl]);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    await uploadFile(file);
+  };
+
+  const uploadFile = async (file) => {
     setUploading(true);
     setError(null);
 
@@ -55,6 +66,40 @@ export const ImageUploader = ({ userId, onUpload, onDelete, existingImageUrl, cl
     }
   };
 
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      await uploadFile(file);
+    } else {
+      setError('Please drop an image file');
+    }
+  };
+
+  const handleDropzoneClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <div className={`image-uploader ${className}`}>
       {/* Preview */}
@@ -76,7 +121,15 @@ export const ImageUploader = ({ userId, onUpload, onDelete, existingImageUrl, cl
       )}
 
       {/* Upload Controls */}
-      <div className="image-uploader__dropzone">
+      <div 
+        ref={dropzoneRef}
+        className={`image-uploader__dropzone ${isDragging ? 'image-uploader__dropzone--dragging' : ''}`}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        onClick={handleDropzoneClick}
+      >
         <input
           ref={fileInputRef}
           type="file"
@@ -85,16 +138,29 @@ export const ImageUploader = ({ userId, onUpload, onDelete, existingImageUrl, cl
           className="image-uploader__input"
           disabled={uploading}
         />
-        {uploading && (
-          <div className="image-uploader__loading">
-            Uploading...
-          </div>
-        )}
-        {error && (
-          <div className="image-uploader__error">
-            {error}
-          </div>
-        )}
+        <div className="image-uploader__dropzone-content">
+          <p>Click or drag and drop an image here</p>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowImageSelector(true);
+            }}
+            className="image-uploader__select-button"
+          >
+            Select from existing images
+          </button>
+          {uploading && (
+            <div className="image-uploader__loading">
+              Uploading...
+            </div>
+          )}
+          {error && (
+            <div className="image-uploader__error">
+              {error}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Image Selector Modal */}

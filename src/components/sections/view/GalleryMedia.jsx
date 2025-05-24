@@ -58,14 +58,32 @@ export const GalleryMedia = ({ section, collaborators }) => {
             return (
               <div key={index} className="gallery-media__byline">
                 <span className="gallery-media__role">{byline.role}: </span>
-                <span className="gallery-media__name">
-                  {collaborator ? (
-                    collaborator.creditedName || 
-                    `${collaborator.firstName} ${collaborator.lastName}`
-                  ) : (
-                    <span className="gallery-media__name--error">Collaborator not found</span>
-                  )}
-                </span>
+                {Array.isArray(byline.collaborators) && byline.collaborators.length > 1 ? (
+                  <ul className="gallery-media__collaborators-list">
+                    {byline.collaborators.map((collabId, collabIndex) => {
+                      const collab = collaborators[collabId];
+                      return (
+                        <li key={collabIndex} className="gallery-media__collaborator">
+                          {collab ? (
+                            collab.creditedName || 
+                            `${collab.firstName} ${collab.lastName}`
+                          ) : (
+                            <span className="gallery-media__name--error">Collaborator not found</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <span className="gallery-media__name">
+                    {collaborator ? (
+                      collaborator.creditedName || 
+                      `${collaborator.firstName} ${collaborator.lastName}`
+                    ) : (
+                      <span className="gallery-media__name--error">Collaborator not found</span>
+                    )}
+                  </span>
+                )}
               </div>
             );
           })}
